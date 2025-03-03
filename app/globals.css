@@ -1,19 +1,55 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+  --background: #0a0a0a;
+  --foreground: #ededed;
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --primary: #266462;
+  --primary-hover: #5d8b8a;
+  --primary-active: #1d4b4a;
+  --primary-foreground: #ffffff;
+
+  --secondary: #f9f9f9;
+  --secondary-hover: #e4e4e4;
+  --secondary-active: #919191;
+  --secondary-foreground: #222222;
+
+  --black: #363636;
+  --black-hover: #4c4c4c;
+  --black-active: #222222;
+  --black-foreground: #ffffff;
+
+  --white: #ffffff;
+  --white-hover: #f2f2f2;
+  --white-active: #e4e4e4;
+  --white-foreground: #222222;
+
+  --tertiary: #e8b040;
+  --tertiary-hover: #eec470;
+  --tertiary-active: #cb9a38;
+  --tertiary-foreground: #ffffff;
+
+  --gradient: linear-gradient(
+    87.18deg,
+    #9747ff 2.74%,
+    #bf7691 49.09%,
+    #ffbf3f 96.38%
+  );
+  --gradient-hover: linear-gradient(
+    87.18deg,
+    #bf7691 2.74%,
+    #ffbf3f 49.09%,
+    #9747ff 96.38%
+  );
+  --gradient-active: linear-gradient(
+    87.18deg,
+    #ffbf3f 2.74%,
+    #bf7691 52.37%,
+    #9747ff 96.38%
+  );
+  --gradient-foreground: #ffffff;
 }
 
 body {
-  color: var(--foreground);
-  background: var(--background);
   font-family: var(--font-sans);
 }
