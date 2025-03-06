@@ -12,3 +12,4 @@ export { default as Heading5 } from "./typography/heading5";
 export { default as Heading6 } from "./typography/heading6";
 
 export { default as MainLayout } from "./layout/main-layout";
+export { default as Container } from "./layout/container";

@@ -2,10 +2,10 @@
 
 import { cn } from "@/lib/utils";
 import Image from "next/image";
-import React, { FC, useState } from "react";
+import React, { FC, ReactNode, useState } from "react";
 
 interface IButtonProps {
-  text?: string;
+  children?: ReactNode | string;
   type?: "primary" | "secondary" | "black" | "white" | "tertiary" | "gradient";
   justIcon?: boolean;
   size?: "sm" | "md";
@@ -18,7 +18,7 @@ interface IButtonProps {
 }
 
 const Button: FC<IButtonProps> = ({
-  text = "clickme",
+  children = "clickme",
   type = "primary",
   justIcon = false,
   size = "md",
@@ -112,7 +112,7 @@ const Button: FC<IButtonProps> = ({
       onMouseUp={() => setActive(false)}
     >
       {LeadingIcon}
-      {!justIcon && text}
+      {!justIcon && children}
       {TrailingIcon}
     </button>
   );

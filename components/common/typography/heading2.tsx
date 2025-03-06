@@ -5,10 +5,10 @@ const Heading2 = ({
   className,
 }: {
   children: ReactNode;
-  className: string;
+  className?: string;
 }) => {
   return (
-    <h2 className={`text-[32px] font-semibold leading-[147%] ${className}`}>
+    <h2 className={`text-white text-[32px] font-semibold leading-[147%] ${className}`}>
       {children}
     </h2>
   );

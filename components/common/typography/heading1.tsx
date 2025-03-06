@@ -5,7 +5,7 @@ const Heading1 = ({
   className,
 }: {
   children: ReactNode;
-  className: string;
+  className?: string;
 }) => {
   return (
     <h1 className={`text-[48px] font-semibold leading-[129%] ${className}`}>

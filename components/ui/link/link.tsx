@@ -6,17 +6,21 @@ const Link = ({
   href,
   children,
   className,
-  type,
+  type = 1,
 }: {
   href: string;
   children: ReactNode | string;
-  className: string;
-  type: 1 | 2;
+  className?: string;
+  type?: 1 | 2;
 }) => {
   return (
     <NextLink
       href={href}
-      className={cn(type === 1 ? "text-[14px]" : "text-[12px]", className)}
+      className={cn(
+        type === 1 ? "text-[14px]" : "text-[12px]",
+        className,
+        "text-white p-2"
+      )}
     >
       {children}
     </NextLink>
