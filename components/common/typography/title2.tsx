@@ -1,3 +1,4 @@
+import { cn } from "@/lib/utils";
 import React, { ReactNode } from "react";
 
 const Title2 = ({
@@ -5,10 +6,10 @@ const Title2 = ({
   className,
 }: {
   children: ReactNode;
-  className: string;
+  className?: string;
 }) => {
   return (
-    <p className={`text-[12px] font-semibold leading-[110%] ${className}`}>
+    <p className={cn("text-[12px] font-normal leading-[110%]", className)}>
       {children}
     </p>
   );

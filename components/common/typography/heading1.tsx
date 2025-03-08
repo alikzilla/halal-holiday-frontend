@@ -8,7 +8,7 @@ const Heading1 = ({
   className?: string;
 }) => {
   return (
-    <h1 className={`text-[48px] font-semibold leading-[129%] ${className}`}>
+    <h1 className={`text-white text-[48px] font-semibold leading-[129%] ${className}`}>
       {children}
     </h1>
   );

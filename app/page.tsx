@@ -1,5 +1,5 @@
-import { MainLayout as Layout } from "@/components/common";
+import Homepage from "@/pages/home/home";
 
 export default function Home() {
-  return <Layout isTransparent={false}>Home page</Layout>;
+  return <Homepage />;
 }
