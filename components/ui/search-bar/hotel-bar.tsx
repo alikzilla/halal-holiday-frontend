@@ -91,7 +91,7 @@ const HotelSearchBar = () => {
     <div className="w-full">
       <div className="flex w-full items-center justify-between gap-4">
         {/* From Destination Button */}
-        <div className="relative flex-1">
+        <div className="relative flex-1 z-13">
           <div
             className="flex items-center gap-2 rounded-full cursor-pointer transition-all duration-300 hover:bg-gray-100"
             onClick={toggleFromModal}
@@ -121,7 +121,7 @@ const HotelSearchBar = () => {
         </div>
 
         {/* To Destination Button */}
-        <div className="relative flex-1">
+        <div className="relative flex-1 z-13">
           <div
             className="flex items-center gap-2 rounded-full cursor-pointer transition-all duration-300 hover:bg-gray-100"
             onClick={toggleToModal}
@@ -151,9 +151,9 @@ const HotelSearchBar = () => {
         </div>
 
         {/* Date Check-in/Check-out Button */}
-        <div className="relative flex-1">
+        <div className="relative flex-1 z-12">
           <div
-            className="flex items-center gap-2 rounded-full cursor-pointer transition-all duration-300 hover:bg-gray-100"
+            className="relative z-14 flex items-center gap-2 rounded-full cursor-pointer transition-all duration-300 hover:bg-gray-100"
             onClick={toggleDateModal}
           >
             <Image
@@ -185,9 +185,9 @@ const HotelSearchBar = () => {
         </div>
 
         {/* Add Guests Button */}
-        <div className="relative flex-1">
+        <div className="relative flex-1 z-12">
           <div
-            className="flex items-center gap-2 rounded-full cursor-pointer transition-all duration-300 hover:bg-gray-100"
+            className="relative z-12 flex items-center gap-2 rounded-full cursor-pointer transition-all duration-300 hover:bg-gray-100"
             onClick={toggleGuestsModal}
           >
             <Image
@@ -312,7 +312,6 @@ const Modal = ({
   );
 };
 
-// Date Modal Component
 const DateModal = ({
   title,
   onClose,
@@ -322,45 +321,248 @@ const DateModal = ({
   onClose: () => void;
   onSelect: (checkIn: string, checkOut: string) => void;
 }) => {
-  const [checkIn, setCheckIn] = useState("");
-  const [checkOut, setCheckOut] = useState("");
+  const [checkIn, setCheckIn] = useState<Date | null>(null);
+  const [checkOut, setCheckOut] = useState<Date | null>(null);
+  const [currentMonth, setCurrentMonth] = useState(new Date().getMonth());
+  const [currentYear, setCurrentYear] = useState(new Date().getFullYear());
+  const [view, setView] = useState<"calendar" | "year" | "month">("calendar");
 
-  const handleSelect = () => {
-    onSelect(checkIn, checkOut);
+  const months = [
+    "January", "February", "March", "April", "May", "June",
+    "July", "August", "September", "October", "November", "December",
+  ];
+
+  const years = Array.from({ length: 12 }, (_, i) => currentYear - 6 + i);
+
+  // Get the number of days in a month
+  const getDaysInMonth = (year: number, month: number) => {
+    return new Date(year, month + 1, 0).getDate();
+  };
+
+  // Get the first day of the month (0 = Monday, 1 = Tuesday, etc.)
+  const getFirstDayOfMonth = (year: number, month: number) => {
+    const firstDay = new Date(year, month, 1).getDay();
+    // Adjust to make Monday the first day (0 = Monday, 1 = Tuesday, etc.)
+    return firstDay === 0 ? 6 : firstDay - 1;
+  };
+
+  // Handle date selection
+  const handleDateClick = (date: Date) => {
+    if (!checkIn || (checkIn && checkOut)) {
+      setCheckIn(date);
+      setCheckOut(null);
+    } else if (date > checkIn) {
+      setCheckOut(date);
+    } else {
+      setCheckIn(date);
+      setCheckOut(null);
+    }
+  };
+
+  // Clear selected dates
+  const handleClear = () => {
+    setCheckIn(null);
+    setCheckOut(null);
+  };
+
+  // Apply selected dates
+  const handleApply = () => {
+    if (checkIn && checkOut) {
+      onSelect(checkIn.toISOString().split("T")[0], checkOut.toISOString().split("T")[0]);
+      onClose();
+    }
+  };
+
+  // Go to the previous month
+  const handlePrevMonth = () => {
+    if (currentMonth === 0) {
+      setCurrentMonth(11);
+      setCurrentYear(currentYear - 1);
+    } else {
+      setCurrentMonth(currentMonth - 1);
+    }
+  };
+
+  // Go to the next month
+  const handleNextMonth = () => {
+    if (currentMonth === 11) {
+      setCurrentMonth(0);
+      setCurrentYear(currentYear + 1);
+    } else {
+      setCurrentMonth(currentMonth + 1);
+    }
+  };
+
+  // Render the calendar grid
+  const renderCalendar = () => {
+    const daysInMonth = getDaysInMonth(currentYear, currentMonth);
+    const firstDayOfMonth = getFirstDayOfMonth(currentYear, currentMonth);
+    const days = [];
+
+    // Days from the previous month
+    const prevMonthDays = getDaysInMonth(currentYear, currentMonth - 1);
+    for (let i = firstDayOfMonth - 1; i >= 0; i--) {
+      const date = new Date(currentYear, currentMonth - 1, prevMonthDays - i);
+      days.push(
+        <div
+          key={`prev-${i}`}
+          className="text-center p-2 text-gray-400 cursor-pointer hover:bg-gray-100"
+          onClick={() => handleDateClick(date)}
+        >
+          {prevMonthDays - i}
+        </div>
+      );
+    }
+
+    // Days from the current month
+    for (let i = 1; i <= daysInMonth; i++) {
+      const date = new Date(currentYear, currentMonth, i);
+      const isSelected =
+        checkIn &&
+        checkOut &&
+        date >= checkIn &&
+        date <= checkOut;
+      const isCheckIn = checkIn && date.toDateString() === checkIn.toDateString();
+      const isCheckOut = checkOut && date.toDateString() === checkOut.toDateString();
+
+      days.push(
+        <div
+          key={i}
+          className={`text-center p-2 cursor-pointer ${
+            isSelected
+              ? "bg-blue-100"
+              : isCheckIn || isCheckOut
+              ? "bg-blue-500 text-white"
+              : "hover:bg-gray-100"
+          }`}
+          onClick={() => handleDateClick(date)}
+        >
+          {i}
+        </div>
+      );
+    }
+
+    // Days from the next month
+    const totalCells = 42; // 6 rows * 7 days
+    const remainingCells = totalCells - days.length;
+    for (let i = 1; i <= remainingCells; i++) {
+      const date = new Date(currentYear, currentMonth + 1, i);
+      days.push(
+        <div
+          key={`next-${i}`}
+          className="text-center p-2 text-gray-400 cursor-pointer hover:bg-gray-100"
+          onClick={() => handleDateClick(date)}
+        >
+          {i}
+        </div>
+      );
+    }
+
+    return (
+      <div className="grid grid-cols-7 gap-1">
+        {["Mo", "Tu", "We", "Th", "Fr", "Sa", "Su"].map((day) => (
+          <div key={day} className="text-center font-bold">
+            {day}
+          </div>
+        ))}
+        {days}
+      </div>
+    );
+  };
+
+  // Render the year selection view
+  const renderYearView = () => {
+    return (
+      <div className="grid grid-cols-3 gap-4">
+        {years.map((year) => (
+          <div
+            key={year}
+            className="text-center p-2 cursor-pointer hover:bg-gray-100"
+            onClick={() => {
+              setCurrentYear(year);
+              setView("month"); // Proceed to month selection
+            }}
+          >
+            {year}
+          </div>
+        ))}
+      </div>
+    );
+  };
+
+  // Render the month selection view
+  const renderMonthView = () => {
+    return (
+      <div className="grid grid-cols-3 gap-4">
+        {months.map((month, index) => (
+          <div
+            key={month}
+            className="text-center p-2 cursor-pointer hover:bg-gray-100"
+            onClick={() => {
+              setCurrentMonth(index);
+              setView("calendar"); // Return to calendar view
+            }}
+          >
+            {month}
+          </div>
+        ))}
+      </div>
+    );
   };
 
   return (
     <>
       {/* Backdrop */}
       <div
-        className="fixed inset-0 flex items-center justify-center z-10"
+        className="absolute top-[80px] flex items-center justify-center z-50"
         onClick={onClose}
-      />
-      {/* Modal */}
-      <div
-        className="absolute z-20 top-[80px] flex items-center justify-content"
-        onClick={(e) => e.stopPropagation()}
       >
-        <div className="bg-white p-6 rounded-lg w-96">
+        {/* Modal */}
+        <div
+          className="bg-white p-6 rounded-lg w-96 shadow-lg"
+          onClick={(e) => e.stopPropagation()}
+        >
           <h2 className="text-lg font-bold mb-4">{title}</h2>
-          <input
-            type="date"
-            placeholder="Check-in"
-            className="w-full p-2 border rounded mb-4"
-            onChange={(e) => setCheckIn(e.target.value)}
-          />
-          <input
-            type="date"
-            placeholder="Check-out"
-            className="w-full p-2 border rounded mb-4"
-            onChange={(e) => setCheckOut(e.target.value)}
-          />
-          <div className="flex justify-end gap-2">
-            <Button type="secondary" onClick={onClose}>
-              Cancel
+
+          {/* Month Navigation and Selection */}
+          <div className="flex justify-between items-center mb-4">
+            {/* Previous Month Button */}
+            <button
+              onClick={handlePrevMonth}
+              className="p-2 hover:bg-gray-100 rounded"
+            >
+              {"<"}
+            </button>
+
+            {/* Select Month and Year Button */}
+            <button
+              onClick={() => setView("year")}
+              className="p-2 hover:bg-gray-100 rounded"
+            >
+              {months[currentMonth]} {currentYear}
+            </button>
+
+            {/* Next Month Button */}
+            <button
+              onClick={handleNextMonth}
+              className="p-2 hover:bg-gray-100 rounded"
+            >
+              {">"}
+            </button>
+          </div>
+
+          {/* Calendar, Year, or Month View */}
+          {view === "calendar" && renderCalendar()}
+          {view === "year" && renderYearView()}
+          {view === "month" && renderMonthView()}
+
+          {/* Action Buttons */}
+          <div className="flex justify-end gap-2 mt-4">
+            <Button type="secondary" onClick={handleClear}>
+              Clear
             </Button>
-            <Button type="primary" onClick={handleSelect}>
-              Select
+            <Button type="primary" onClick={handleApply}>
+              Apply
             </Button>
           </div>
         </div>
