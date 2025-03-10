@@ -53,8 +53,14 @@ const SearchBar = () => {
   const router = useRouter();
   const pathname = usePathname();
 
+  // Determine if the current tab is active
+  const isTabActive = (link: string) => {
+    return pathname === link || (pathname === "/" && link === "/hotel");
+  };
+
   const renderSearchBar = () => {
     switch (pathname) {
+      case "/":
       case "/hotel":
         return <HotelSearchBar />;
       case "/flights":
@@ -78,9 +84,9 @@ const SearchBar = () => {
         {tabItems.map((item, index) => (
           <Button
             key={index}
-            type={pathname === item.link ? "primary" : "secondary"}
+            type={isTabActive(item.link) ? "primary" : "secondary"}
             leadingIcon={true}
-            leading={pathname === item.link ? item.iconActive : item.icon}
+            leading={isTabActive(item.link) ? item.iconActive : item.icon}
             onClick={() => router.push(item.link)}
           >
             {item.title}
