@@ -2,6 +2,7 @@ import { useState } from "react";
 import Button from "../button/button";
 import Image from "next/image";
 import { Heading6, Title1, Title2 } from "@/components/common";
+import { cn } from "@/lib/utils";
 
 const HotelSearchBar = () => {
   const [isFromModalOpen, setIsFromModalOpen] = useState(false);
@@ -313,7 +314,6 @@ const Modal = ({
 };
 
 const DateModal = ({
-  title,
   onClose,
   onSelect,
 }: {
@@ -326,13 +326,33 @@ const DateModal = ({
   const [currentMonth, setCurrentMonth] = useState(new Date().getMonth());
   const [currentYear, setCurrentYear] = useState(new Date().getFullYear());
   const [view, setView] = useState<"calendar" | "year" | "month">("calendar");
+  const [activeTab, setActiveTab] = useState<"calendar" | "flexible">(
+    "calendar"
+  );
+  const [stayDuration, setStayDuration] = useState<
+    "weekend" | "week" | "month" | null
+  >(null);
+  const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth());
 
   const months = [
-    "January", "February", "March", "April", "May", "June",
-    "July", "August", "September", "October", "November", "December",
+    "January",
+    "February",
+    "March",
+    "April",
+    "May",
+    "June",
+    "July",
+    "August",
+    "September",
+    "October",
+    "November",
+    "December",
   ];
 
-  const years = Array.from({ length: 12 }, (_, i) => currentYear - 6 + i);
+  const years = Array.from(
+    { length: 12 },
+    (_, i) => new Date().getFullYear() + i
+  );
 
   // Get the number of days in a month
   const getDaysInMonth = (year: number, month: number) => {
@@ -363,14 +383,42 @@ const DateModal = ({
   const handleClear = () => {
     setCheckIn(null);
     setCheckOut(null);
+    setStayDuration(null);
   };
 
   // Apply selected dates
   const handleApply = () => {
-    if (checkIn && checkOut) {
-      onSelect(checkIn.toISOString().split("T")[0], checkOut.toISOString().split("T")[0]);
-      onClose();
+    if (activeTab === "calendar" && checkIn && checkOut) {
+      onSelect(
+        checkIn.toISOString().split("T")[0],
+        checkOut.toISOString().split("T")[0]
+      );
+    } else if (
+      activeTab === "flexible" &&
+      stayDuration &&
+      selectedMonth !== null
+    ) {
+      const checkInDate = new Date(currentYear, selectedMonth, 1);
+      const checkOutDate = new Date(currentYear, selectedMonth, 1);
+
+      switch (stayDuration) {
+        case "weekend":
+          checkOutDate.setDate(checkInDate.getDate() + 2);
+          break;
+        case "week":
+          checkOutDate.setDate(checkInDate.getDate() + 7);
+          break;
+        case "month":
+          checkOutDate.setMonth(checkInDate.getMonth() + 1);
+          break;
+      }
+
+      onSelect(
+        checkInDate.toISOString().split("T")[0],
+        checkOutDate.toISOString().split("T")[0]
+      );
     }
+    onClose();
   };
 
   // Go to the previous month
@@ -404,13 +452,13 @@ const DateModal = ({
     for (let i = firstDayOfMonth - 1; i >= 0; i--) {
       const date = new Date(currentYear, currentMonth - 1, prevMonthDays - i);
       days.push(
-        <div
+        <Heading6
           key={`prev-${i}`}
-          className="text-center p-2 text-gray-400 cursor-pointer hover:bg-gray-100"
+          className="w-[50px] h-[40px] text-[#ADADAD] flex justify-center items-center cursor-pointer rounded-lg gap-0 hover:bg-gray-100"
           onClick={() => handleDateClick(date)}
         >
           {prevMonthDays - i}
-        </div>
+        </Heading6>
       );
     }
 
@@ -418,27 +466,26 @@ const DateModal = ({
     for (let i = 1; i <= daysInMonth; i++) {
       const date = new Date(currentYear, currentMonth, i);
       const isSelected =
-        checkIn &&
-        checkOut &&
-        date >= checkIn &&
-        date <= checkOut;
-      const isCheckIn = checkIn && date.toDateString() === checkIn.toDateString();
-      const isCheckOut = checkOut && date.toDateString() === checkOut.toDateString();
+        checkIn && checkOut && date >= checkIn && date <= checkOut;
+      const isCheckIn =
+        checkIn && date.toDateString() === checkIn.toDateString();
+      const isCheckOut =
+        checkOut && date.toDateString() === checkOut.toDateString();
 
       days.push(
-        <div
+        <Heading6
           key={i}
-          className={`text-center p-2 cursor-pointer ${
-            isSelected
-              ? "bg-blue-100"
-              : isCheckIn || isCheckOut
-              ? "bg-blue-500 text-white"
+          className={`w-[50px] h-[40px] text-[#222222] flex justify-center items-center cursor-pointer rounded-lg gap-0 ${
+            isCheckIn || isCheckOut
+              ? "bg-[var(--primary)] text-white"
+              : isSelected
+              ? "bg-[#F9F9F9] rounded-none"
               : "hover:bg-gray-100"
           }`}
           onClick={() => handleDateClick(date)}
         >
           {i}
-        </div>
+        </Heading6>
       );
     }
 
@@ -448,22 +495,22 @@ const DateModal = ({
     for (let i = 1; i <= remainingCells; i++) {
       const date = new Date(currentYear, currentMonth + 1, i);
       days.push(
-        <div
+        <Heading6
           key={`next-${i}`}
-          className="text-center p-2 text-gray-400 cursor-pointer hover:bg-gray-100"
+          className="w-[50px] h-[40px] text-[#ADADAD] flex justify-center items-center cursor-pointer rounded-lg gap-0 hover:bg-gray-100"
           onClick={() => handleDateClick(date)}
         >
           {i}
-        </div>
+        </Heading6>
       );
     }
 
     return (
-      <div className="grid grid-cols-7 gap-1">
+      <div className="grid grid-cols-7 gap-4 gap-x-0">
         {["Mo", "Tu", "We", "Th", "Fr", "Sa", "Su"].map((day) => (
-          <div key={day} className="text-center font-bold">
+          <Heading6 key={day} className="text-center text-[#ADADAD]">
             {day}
-          </div>
+          </Heading6>
         ))}
         {days}
       </div>
@@ -475,16 +522,17 @@ const DateModal = ({
     return (
       <div className="grid grid-cols-3 gap-4">
         {years.map((year) => (
-          <div
+          <Button
             key={year}
-            className="text-center p-2 cursor-pointer hover:bg-gray-100"
+            type="secondary"
+            className="border hover:bg-[#E4ECEC] hover:border-[#266462] hover:text-[#266462]"
             onClick={() => {
               setCurrentYear(year);
               setView("month"); // Proceed to month selection
             }}
           >
             {year}
-          </div>
+          </Button>
         ))}
       </div>
     );
@@ -495,17 +543,180 @@ const DateModal = ({
     return (
       <div className="grid grid-cols-3 gap-4">
         {months.map((month, index) => (
-          <div
+          <Button
             key={month}
-            className="text-center p-2 cursor-pointer hover:bg-gray-100"
+            type="secondary"
+            className="border hover:bg-[#E4ECEC] hover:border-[#266462] hover:text-[#266462]"
             onClick={() => {
               setCurrentMonth(index);
               setView("calendar"); // Return to calendar view
             }}
           >
             {month}
-          </div>
+          </Button>
         ))}
+      </div>
+    );
+  };
+
+  const renderMonthViewFlexible = () => {
+    return (
+      <div className="grid grid-cols-3 gap-4">
+        {months.map((month, index) => (
+          <Button
+            key={month}
+            type="secondary"
+            className={cn(
+              `border hover:bg-[#E4ECEC] hover:border-[#266462] hover:text-[#266462]`,
+              selectedMonth === index
+                ? "bg-[#E4ECEC] border-[#266462] text-[#266462]"
+                : ""
+            )}
+            onClick={() => {
+              setSelectedMonth(index);
+            }}
+          >
+            {month}
+          </Button>
+        ))}
+      </div>
+    );
+  };
+
+  const renderCalendarTab = () => {
+    return (
+      <>
+        {/* Month Navigation and Selection */}
+        <div className="flex justify-between items-center mb-4">
+          {/* Previous Month Button */}
+          <Button
+            type="secondary"
+            justIcon
+            leadingIcon
+            leading="arrow-left"
+            onClick={handlePrevMonth}
+          />
+
+          {/* Select Month and Year Button */}
+          <Button type="secondary" onClick={() => setView("year")}>
+            {months[currentMonth]} {currentYear}
+          </Button>
+
+          {/* Next Month Button */}
+          <Button
+            type="secondary"
+            justIcon
+            leadingIcon
+            leading="arrow-right"
+            onClick={handleNextMonth}
+          />
+        </div>
+
+        {/* Calendar, Year, or Month View */}
+        {view === "calendar" && renderCalendar()}
+        {view === "year" && renderYearView()}
+        {view === "month" && renderMonthView()}
+      </>
+    );
+  };
+
+  // Render the Flexible tab
+  const renderFlexibleTab = () => {
+    return (
+      <div className="space-y-4">
+        {/* How long do you want to stay? */}
+        <div>
+          <h3 className="font-medium mb-2">How long do you want to stay?</h3>
+          <div className="flex flex-wrap gap-2">
+            <Button
+              type="secondary"
+              className={cn(
+                "hover:bg-[#E4ECEC] hover:border-[#266462] hover:text-[#266462]",
+                stayDuration === "weekend"
+                  ? "bg-[#E4ECEC] text-[#266462] border border-[#266462]"
+                  : ""
+              )}
+              onClick={() => setStayDuration("weekend")}
+            >
+              {stayDuration === "weekend" ? (
+                <Image
+                  src={"assets/icons/radio.svg"}
+                  alt="radio"
+                  width={16}
+                  height={16}
+                />
+              ) : (
+                <Image
+                  src={"assets/icons/radio-non.svg"}
+                  alt="radio-non"
+                  width={16}
+                  height={16}
+                />
+              )}
+              A weekend
+            </Button>
+            <Button
+              type="secondary"
+              className={cn(
+                "hover:bg-[#E4ECEC] hover:border-[#266462] hover:text-[#266462]",
+                stayDuration === "week"
+                  ? "bg-[#E4ECEC] text-[#266462] border border-[#266462]"
+                  : ""
+              )}
+              onClick={() => setStayDuration("week")}
+            >
+              {stayDuration === "week" ? (
+                <Image
+                  src={"assets/icons/radio.svg"}
+                  alt="radio"
+                  width={16}
+                  height={16}
+                />
+              ) : (
+                <Image
+                  src={"assets/icons/radio-non.svg"}
+                  alt="radio-non"
+                  width={16}
+                  height={16}
+                />
+              )}
+              A week
+            </Button>
+            <Button
+              type="secondary"
+              className={cn(
+                "hover:bg-[#E4ECEC] hover:border-[#266462] hover:text-[#266462]",
+                stayDuration === "month"
+                  ? "bg-[#E4ECEC] text-[#266462] border border-[#266462]"
+                  : ""
+              )}
+              onClick={() => setStayDuration("month")}
+            >
+              {stayDuration === "month" ? (
+                <Image
+                  src={"assets/icons/radio.svg"}
+                  alt="radio"
+                  width={16}
+                  height={16}
+                />
+              ) : (
+                <Image
+                  src={"assets/icons/radio-non.svg"}
+                  alt="radio-non"
+                  width={16}
+                  height={16}
+                />
+              )}
+              A month
+            </Button>
+          </div>
+        </div>
+
+        {/* When do you want to go? */}
+        <div>
+          <h3 className="font-medium mb-2">When do you want to go?</h3>
+          {renderMonthViewFlexible()}
+        </div>
       </div>
     );
   };
@@ -519,49 +730,49 @@ const DateModal = ({
       >
         {/* Modal */}
         <div
-          className="bg-white p-6 rounded-lg w-96 shadow-lg"
+          className="bg-white p-4 rounded-xl w-[388px] shadow-lg"
           onClick={(e) => e.stopPropagation()}
         >
-          <h2 className="text-lg font-bold mb-4">{title}</h2>
-
-          {/* Month Navigation and Selection */}
-          <div className="flex justify-between items-center mb-4">
-            {/* Previous Month Button */}
-            <button
-              onClick={handlePrevMonth}
-              className="p-2 hover:bg-gray-100 rounded"
+          {/* Tabs */}
+          <div className="flex gap-2 mb-4">
+            <Button
+              type={activeTab === "calendar" ? "primary" : "secondary"}
+              className={cn(
+                "flex-1",
+                activeTab === "calendar"
+                  ? "bg-[#E4ECEC] text-[var(--primary)] border border-[var(--primary)] hover:bg-[#E4ECEC]"
+                  : ""
+              )}
+              onClick={() => setActiveTab("calendar")}
             >
-              {"<"}
-            </button>
-
-            {/* Select Month and Year Button */}
-            <button
-              onClick={() => setView("year")}
-              className="p-2 hover:bg-gray-100 rounded"
+              Calendar
+            </Button>
+            <Button
+              type={activeTab === "flexible" ? "primary" : "secondary"}
+              className={cn(
+                "flex-1",
+                activeTab === "flexible"
+                  ? "bg-[#E4ECEC] text-[var(--primary)] border border-[var(--primary)] hover:bg-[#E4ECEC]"
+                  : ""
+              )}
+              onClick={() => setActiveTab("flexible")}
             >
-              {months[currentMonth]} {currentYear}
-            </button>
-
-            {/* Next Month Button */}
-            <button
-              onClick={handleNextMonth}
-              className="p-2 hover:bg-gray-100 rounded"
-            >
-              {">"}
-            </button>
+              Flexible
+            </Button>
           </div>
 
-          {/* Calendar, Year, or Month View */}
-          {view === "calendar" && renderCalendar()}
-          {view === "year" && renderYearView()}
-          {view === "month" && renderMonthView()}
+          {/* Calendar Tab */}
+          {activeTab === "calendar" && renderCalendarTab()}
+
+          {/* Flexible Tab */}
+          {activeTab === "flexible" && renderFlexibleTab()}
 
           {/* Action Buttons */}
           <div className="flex justify-end gap-2 mt-4">
-            <Button type="secondary" onClick={handleClear}>
+            <Button type="secondary" className="flex-1" onClick={handleClear}>
               Clear
             </Button>
-            <Button type="primary" onClick={handleApply}>
+            <Button type="primary" className="flex-1" onClick={handleApply}>
               Apply
             </Button>
           </div>
