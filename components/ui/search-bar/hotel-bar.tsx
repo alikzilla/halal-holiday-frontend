@@ -92,7 +92,7 @@ const HotelSearchBar = () => {
     <div className="w-full">
       <div className="flex w-full items-center justify-between gap-4">
         {/* From Destination Button */}
-        <div className="relative flex-1 z-13">
+        <div className="relative flex-1 z-43">
           <div
             className="flex items-center gap-2 rounded-full cursor-pointer transition-all duration-300 hover:bg-gray-100"
             onClick={toggleFromModal}
@@ -122,7 +122,7 @@ const HotelSearchBar = () => {
         </div>
 
         {/* To Destination Button */}
-        <div className="relative flex-1 z-13">
+        <div className="relative flex-1 z-43">
           <div
             className="flex items-center gap-2 rounded-full cursor-pointer transition-all duration-300 hover:bg-gray-100"
             onClick={toggleToModal}
@@ -152,9 +152,9 @@ const HotelSearchBar = () => {
         </div>
 
         {/* Date Check-in/Check-out Button */}
-        <div className="relative flex-1 z-12">
+        <div className="relative flex-1 z-42">
           <div
-            className="relative z-14 flex items-center gap-2 rounded-full cursor-pointer transition-all duration-300 hover:bg-gray-100"
+            className="relative z-44 flex items-center gap-2 rounded-full cursor-pointer transition-all duration-300 hover:bg-gray-100"
             onClick={toggleDateModal}
           >
             <Image
@@ -186,9 +186,9 @@ const HotelSearchBar = () => {
         </div>
 
         {/* Add Guests Button */}
-        <div className="relative flex-1 z-12">
+        <div className="relative flex-1 z-42">
           <div
-            className="relative z-12 flex items-center gap-2 rounded-full cursor-pointer transition-all duration-300 hover:bg-gray-100"
+            className="relative z-42 flex items-center gap-2 rounded-full cursor-pointer transition-all duration-300 hover:bg-gray-100"
             onClick={toggleGuestsModal}
           >
             <Image

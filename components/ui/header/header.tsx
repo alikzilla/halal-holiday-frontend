@@ -40,7 +40,7 @@ const Header = ({ isTransparent = false }: { isTransparent?: boolean }) => {
     <header
       className={cn(
         isTransparent ? "bg-transparent" : "bg-[var(--primary)]",
-        isScrolled && isTransparent && "backdrop-blur-lg",
+        isScrolled && isTransparent && "bg-[var(--primary)]",
         "w-full h-[80px] flex items-center fixed top-0 z-50 transition-all duration-300"
       )}
     >

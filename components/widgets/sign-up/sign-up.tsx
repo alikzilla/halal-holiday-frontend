@@ -6,13 +6,13 @@ const CustomTour = () => {
     <section className="py-[30px]">
       <Container>
         <div
-          className="relative z-1 h-[330px] flex items-center justify-center bg-cover bg-center rounded-xl"
+          className="relative h-[330px] flex items-center justify-center bg-cover bg-center rounded-xl"
           style={{
             backgroundImage: "url('/assets/backgrounds/custom-tour.jpg')",
           }}
         >
-          <div className="absolute z-2 inset-0 bg-[#222222]/60 rounded-xl"></div>
-          <div className="relative z-3 flex flex-col items-center justify-center gap-2">
+          <div className="absolute inset-0 bg-[#222222]/60 rounded-xl"></div>
+          <div className="relative flex flex-col items-center justify-center gap-2">
             <Heading2 className="w-[700px] text-center">
               Sign Up Now & Unlock Exclusive Discounts!
             </Heading2>

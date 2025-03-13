@@ -53,7 +53,6 @@ const SearchBar = () => {
   const router = useRouter();
   const pathname = usePathname();
 
-  // Determine if the current tab is active
   const isTabActive = (link: string) => {
     return pathname === link || (pathname === "/" && link === "/hotel");
   };
@@ -79,7 +78,7 @@ const SearchBar = () => {
   };
 
   return (
-    <section className="w-[1300px] flex flex-col items-start gap-4 p-6 rounded-[12px] bg-white">
+    <section className="w-full flex flex-col items-start gap-4 p-6 rounded-[12px] bg-white">
       <div className="flex items-center justify-start gap-2 bg-[#F9F9F9] p-3 rounded-[12px]">
         {tabItems.map((item, index) => (
           <Button
