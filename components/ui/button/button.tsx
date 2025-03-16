@@ -6,7 +6,14 @@ import React, { FC, ReactNode, useState } from "react";
 
 interface IButtonProps {
   children?: ReactNode | string;
-  type?: "primary" | "secondary" | "black" | "white" | "tertiary" | "gradient";
+  type?:
+    | "primary"
+    | "secondary"
+    | "black"
+    | "white"
+    | "tertiary"
+    | "gradient"
+    | "transparent";
   justIcon?: boolean;
   size?: "sm" | "md";
   leadingIcon?: boolean;
@@ -49,6 +56,7 @@ const Button: FC<IButtonProps> = ({
       "bg-[var(--tertiary)] text-[var(--tertiary-foreground)] hover:bg-[var(--tertiary-hover)] active:bg-[var(--tertiary-active)]",
     gradient:
       "bg-gradient-to-r text-[var(--gradient-foreground)] bg-[length:200%_200%] bg-[position:100%_100%] hover:bg-[position:0%_0%] transition-all duration-100 ease-in",
+    transparent: "bg-transparent",
   };
 
   const sizeStyles = {

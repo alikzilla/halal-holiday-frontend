@@ -1,5 +1,16 @@
 import { MainLayout as Layout } from "@/components/common";
-import { Hero, SignUp } from "@/components/widgets";
+import {
+  DownloadApp,
+  Hero,
+  InsightsStories,
+  OtherHolidays,
+  PopularDestination,
+  SignUp,
+  SpecialOffers,
+  TopCities,
+  TopPicks,
+  TrustedCompanies,
+} from "@/components/widgets";
 
 const Hotel = () => {
   return (
@@ -10,6 +21,18 @@ const Hotel = () => {
         button_text="Discover Features"
         background_image="hotel-hero"
       />
+      <TrustedCompanies />
+      <SpecialOffers />
+      {/* Best Offers */}
+      <PopularDestination />
+      {/* Experience halal friendly */}
+      <TopPicks />
+      <DownloadApp />
+      {/* Top countries */}
+      <TopCities />
+      <InsightsStories />
+      <PopularDestination />
+      <OtherHolidays />
       <SignUp />
     </Layout>
   );

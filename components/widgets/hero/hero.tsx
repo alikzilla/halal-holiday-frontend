@@ -14,7 +14,7 @@ const Hero = ({
 }) => {
   return (
     <div
-      className="relative z-1 w-full h-full flex items-center justify-center bg-cover bg-center pt-[128px] pb-[40px]"
+      className="relative z-1 w-full h-screen flex items-center justify-center bg-cover bg-center pt-[128px] pb-[40px]"
       style={{
         backgroundImage: `url('/assets/backgrounds/${background_image}.jpg')`,
       }}
@@ -23,12 +23,12 @@ const Hero = ({
 
       <Container>
         <section className="w-full relative z-49 flex flex-col gap-8">
-          <div className="w-full flex flex-col gap-4 items-center text-center">
+          <div className="w-full flex flex-col gap-3 items-center text-center">
             <HeroBadge text="Your travel buddy" />
             <Heading1 className="max-w-[800px]">{title}</Heading1>
-            <Body2 className="max-w-[600px] font-normal">{subtitle}</Body2>
+            <Body2 className="max-w-[600px] h-[70px] font-normal">{subtitle}</Body2>
 
-            <Button type="primary" className="mt-4">
+            <Button type="primary" className="mt-1">
               {button_text}
             </Button>
           </div>
