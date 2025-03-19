@@ -123,7 +123,9 @@ const OtherHolidays = () => {
                   className="absolute inset-0 bg-cover bg-center"
                   style={{ backgroundImage: `url('${holiday.image}')` }}
                 ></div>
-                <div className="absolute inset-0 bg-black/30 flex items-end p-4">
+                <div className="absolute z-[1] bottom-0 left-0 w-full h-1/3 backdrop-blur-lg mask-gradient rounded-lg"></div>
+
+                <div className="absolute z-2 inset-0 bg-black/30 flex items-end p-4">
                   <Title1 className="w-[230px] text-white">
                     {holiday.title}
                   </Title1>

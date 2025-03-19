@@ -143,10 +143,11 @@ const AdventuresSection = () => {
                     className="absolute inset-0 bg-cover bg-center"
                     style={{ backgroundImage: `url(${adventure.image})` }}
                   ></div>
+                  <div className="absolute z-[1] bottom-0 left-0 w-full h-1/3 backdrop-blur-lg mask-gradient rounded-lg"></div>
                   {/* Tint Overlay */}
                   <div className="absolute inset-0 bg-black/30"></div>
                   {/* Content */}
-                  <div className="absolute bottom-0 left-0 right-0 p-4">
+                  <div className="absolute z-1 bottom-0 left-0 right-0 p-4">
                     <Heading6 className="text-white">
                       {adventure.duration}
                     </Heading6>

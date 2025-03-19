@@ -98,6 +98,7 @@ const TopPicks = () => {
                 key={stay.id}
                 className="flex flex-col items-start gap-[22px] overflow-hidden border border-[1px] border-[#F2F2F2] p-2 rounded-xl shadow-sm"
               >
+                <div className="absolute z-[1] bottom-0 left-0 w-full h-1/3 backdrop-blur-lg mask-gradient rounded-lg"></div>
                 <Image
                   src={stay.image}
                   alt={stay.name}

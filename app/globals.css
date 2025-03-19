@@ -53,3 +53,7 @@
 body {
   font-family: var(--font-sans);
 }
+
+.mask-gradient {
+  mask: linear-gradient(rgba(0,0,0,0) 0%, gray 30%, gray 100%, rgba(0,0,0,0));
+}

@@ -67,7 +67,7 @@ const Header = ({ isTransparent = false }: { isTransparent?: boolean }) => {
               <Link href={link.href} key={index} className="relative">
                 {link.title}
                 {activeLink === link.href && (
-                  <div className="absolute bottom-[-20px] left-0 w-full h-[2px] bg-white transition-all duration-300"></div>
+                  <div className="absolute bottom-[-3px] left-0 w-full h-[2px] bg-white transition-all duration-300"></div>
                 )}
               </Link>
             ))}
