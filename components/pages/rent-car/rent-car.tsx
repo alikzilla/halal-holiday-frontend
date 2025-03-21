@@ -10,7 +10,7 @@ const RentCar = () => {
         button_text="Discover Features"
         background_image="rent-car-hero"
       />
-      <TrustedCompanies />
+      <TrustedCompanies variant="home" />
       {/* Rent car serices */}
       <DownloadApp />
       {/* Popular car hire */}

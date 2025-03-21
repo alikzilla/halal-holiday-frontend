@@ -1,5 +1,5 @@
 import Hotel from "@/components/pages/hotel/hotel";
 
-export default function Home() {
+export default function HotelPage() {
   return <Hotel />;
 }

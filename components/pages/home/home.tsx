@@ -24,7 +24,7 @@ const Homepage = () => {
         button_text="Discover Features"
         background_image="home-hero"
       />
-      <TrustedCompanies />
+      <TrustedCompanies variant="home" />
       <SpecialOffers />
       <BestServices />
       <UnforgettableAdventures />

@@ -21,7 +21,7 @@ const Hotel = () => {
         button_text="Discover Features"
         background_image="hotel-hero"
       />
-      <TrustedCompanies />
+      <TrustedCompanies variant="hotel" />
       <SpecialOffers />
       {/* Best Offers */}
       <PopularDestination />

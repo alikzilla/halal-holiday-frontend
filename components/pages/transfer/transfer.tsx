@@ -15,7 +15,7 @@ const Transfer = () => {
         button_text="Discover Features"
         background_image="transfer-hero"
       />
-      <TrustedCompanies />
+      <TrustedCompanies variant="home" />
       {/* Top transfer routes */}
       {/* Reliable Car Transfer Services Across the Globe */}
       {/* Transfer Services in Worldwide */}

@@ -26,7 +26,9 @@ const Hero = ({
           <div className="w-full flex flex-col gap-3 items-center text-center">
             <HeroBadge text="Your travel buddy" />
             <Heading1 className="max-w-[800px]">{title}</Heading1>
-            <Body2 className="max-w-[600px] h-[70px] font-normal">{subtitle}</Body2>
+            <Body2 className="max-w-[600px] h-[70px] font-normal">
+              {subtitle}
+            </Body2>
 
             <Button type="primary" className="mt-1">
               {button_text}

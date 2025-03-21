@@ -1,3 +1,5 @@
+"use client";
+
 import { useState } from "react";
 import Button from "../button/button";
 import Image from "next/image";
@@ -89,7 +91,7 @@ const HotelSearchBar = () => {
   };
 
   return (
-    <div className="w-full">
+    <div className="w-full py-4">
       <div className="flex w-full items-center justify-between gap-4">
         {/* From Destination Button */}
         <div className="relative flex-1 z-43">

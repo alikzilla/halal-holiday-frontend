@@ -1,5 +1,5 @@
 import Transfer from "@/components/pages/transfer/transfer";
 
-export default function Home() {
+export default function TransferPage() {
   return <Transfer />;
 }

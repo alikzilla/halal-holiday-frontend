@@ -9,6 +9,7 @@ import {
 import Image from "next/image";
 import Link from "next/link";
 import Button from "../button/button";
+import logo from "../../../public/logo.svg";
 
 const Footer = () => {
   return (
@@ -16,7 +17,7 @@ const Footer = () => {
       <Container>
         <section className="flex items-center justify-between gap-6">
           <div className="flex flex-col items-start justify-start gap-8">
-            <Image src={"logo.svg"} alt="logo" width={175} height={25} />
+            <Image src={logo} alt="logo" width={175} height={25} />
 
             <div className="flex flex-col items-start gap-2">
               <Heading2 className="lg:max-w-[400px]">

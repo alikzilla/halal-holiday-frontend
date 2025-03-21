@@ -1,5 +1,5 @@
 import Flight from "@/components/pages/flight/flight";
 
-export default function Home() {
+export default function FlightPage() {
   return <Flight />;
 }

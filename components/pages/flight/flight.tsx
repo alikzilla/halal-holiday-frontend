@@ -20,7 +20,7 @@ const Hotel = () => {
         button_text="Discover Features"
         background_image="flight-hero"
       />
-      <TrustedCompanies />
+      <TrustedCompanies variant="home" />
       <SpecialOffers />
       {/* Popular flights of the day */}
       <TopPicks />
