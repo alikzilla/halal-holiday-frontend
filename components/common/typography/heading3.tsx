@@ -9,9 +9,13 @@ const Heading3 = ({
   className?: string;
 }) => {
   return (
-    <h2 className={(cn("text-[24px] font-semibold leading-[147%]"), className)}>
+    <h3
+      className={
+        (cn("text-[#222] text-[24px] font-semibold leading-[147%]"), className)
+      }
+    >
       {children}
-    </h2>
+    </h3>
   );
 };
 

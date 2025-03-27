@@ -9,57 +9,8 @@ import {
   HotelSearchBar,
   FilterHotelHeader,
 } from "@/components/ui";
-
-import { IHotel } from "@/types/hotels";
 import { Suspense, useState } from "react";
-
-const hotels: IHotel[] = [
-  {
-    id: 1,
-    name: "The Ritz-Carlton",
-    location: "Istanbul, Turkey",
-    duration: "3 nights",
-    bedType: "1 King Bed",
-    price: 450,
-    taxesIncluded: true,
-  },
-  {
-    id: 2,
-    name: "Four Seasons Hotel",
-    location: "Bosphorus, Istanbul, Turkey",
-    duration: "2 nights",
-    bedType: "1 King Bed, 1 Sofa Bed",
-    price: 750,
-    discountedPrice: 600,
-    taxesIncluded: true,
-    features: [
-      "Sports mode",
-      "OPS Navigation",
-      "Open Roof",
-      "Premium Sound System",
-    ],
-    roomsLeft: 3,
-    isMostBooked: true,
-  },
-  {
-    id: 3,
-    name: "Four Seasons Hotel",
-    location: "Bosphorus, Istanbul, Turkey",
-    duration: "2 nights",
-    bedType: "1 King Bed, 1 Sofa Bed",
-    price: 750,
-    discountedPrice: 600,
-    taxesIncluded: true,
-    features: [
-      "Sports mode",
-      "OPS Navigation",
-      "Open Roof",
-      "Premium Sound System",
-    ],
-    roomsLeft: 3,
-    isMostBooked: true,
-  },
-];
+import { hotels } from "@/lib/globals";
 
 const Hotels = () => {
   const [layout, setLayout] = useState<"grid" | "flex">("grid");
@@ -70,7 +21,7 @@ const Hotels = () => {
         <Suspense>
           <HotelSearchBar />
           <Breadcrumb />
-          <div className="flex mt-6">
+          <div className="flex">
             <FilterHotel />
             <div className="flex-1 ml-6">
               <FilterHotelHeader />

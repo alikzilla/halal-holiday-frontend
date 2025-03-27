@@ -4,7 +4,6 @@ import React from "react";
 import { MainLayout as Layout, Container } from "@/components/common";
 import {
   HotelFacilities,
-  HotelFAQ,
   HotelHeader,
   HotelImages,
   HotelMap,
@@ -14,28 +13,31 @@ import {
   HotelSurroundings,
   HotelThingsToKnow,
   HotelDesc,
+  Breadcrumb,
 } from "@/components/ui";
-import { Hotel } from "@/types/hotels";
+import { IHotel } from "@/types/hotels";
+import HalalFriendlyFeatures from "@/components/ui/hotel-page/halal-friendly";
 
-const HotelSingle = ({ hotel }: { hotel: Hotel }) => {
+const HotelSingle = ({ hotel }: { hotel: IHotel }) => {
   return (
     <Layout isTransparent={false}>
       <Container className="pt-[90px] pb-[80px]">
+        <Breadcrumb />
         <HotelHeader
           name={hotel.name}
-          address={hotel.address}
-          rating={hotel.rating}
+          address={hotel.location}
+          rating={hotel.rating !== undefined ? hotel.rating.toString() : "N/A"}
         />
-        <HotelImages images={hotel.images} />
+        <HotelImages images={hotel.images || []} />
         <HotelNavbar />
-        <HotelDesc description={hotel.description} />
-        <HotelRooms rooms={hotel.rooms} />
+        <HotelDesc description={hotel.description || ""} />
+        <HalalFriendlyFeatures />
+        <HotelRooms />
         <HotelMap />
-        <HotelReviews reviews={hotel.reviews} />
-        <HotelSurroundings surroundings={hotel.surroundings} />
-        <HotelFacilities facilities={hotel.facilities} />
-        <HotelThingsToKnow thingsToKnow={hotel.thingsToKnow} />
-        <HotelFAQ faqs={hotel.faqs} />
+        <HotelReviews />
+        <HotelSurroundings />
+        <HotelFacilities />
+        <HotelThingsToKnow />
       </Container>
     </Layout>
   );

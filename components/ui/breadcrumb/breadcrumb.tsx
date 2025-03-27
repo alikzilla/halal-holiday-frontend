@@ -7,7 +7,6 @@ import { Heading6 } from "@/components/common";
 
 const Breadcrumb = () => {
   const pathname = usePathname();
-
   const pathSegments = pathname.split("/").filter(Boolean);
 
   const items = pathSegments.map((segment, index) => {
@@ -15,14 +14,24 @@ const Breadcrumb = () => {
     return {
       title: segment.replace(/-/g, " "),
       href,
+      isCurrent: index === pathSegments.length - 1,
     };
   });
 
+  // Function to capitalize each word
+  const capitalize = (str: string) => {
+    return str.replace(/\b\w/g, (char) => char.toUpperCase());
+  };
+
   return (
-    <section className="flex items-center space-x-2 text-sm text-gray-600">
+    <section className="flex items-center space-x-2 text-sm py-4">
       <Link href="/">
-        <Heading6 className="text-black hover:text-gray-900 cursor-pointer">
-          Home
+        <Heading6
+          className={`${
+            pathSegments.length === 0 ? "text-black" : "text-[#ADADAD]"
+          } hover:text-gray-900 cursor-pointer`}
+        >
+          {capitalize("home")}
         </Heading6>
       </Link>
 
@@ -44,8 +53,12 @@ const Breadcrumb = () => {
             />
           </svg>
           <Link href={item.href}>
-            <Heading6 className="text-black hover:text-gray-900 cursor-pointer">
-              {item.title}
+            <Heading6
+              className={`${
+                item.isCurrent ? "text-black" : "text-[#ADADAD]"
+              } hover:text-gray-900 cursor-pointer transition-all duration-300`}
+            >
+              {capitalize(item.title)}
             </Heading6>
           </Link>
         </React.Fragment>

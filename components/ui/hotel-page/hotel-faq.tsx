@@ -1,8 +1,6 @@
-const HotelFAQ = ({
-  faqs,
-}: {
-  faqs: { question: string; answer: string }[];
-}) => {
+import { FAQ } from "@/types/hotels";
+
+const HotelFAQ = ({ faqs }: { faqs: FAQ[] }) => {
   return (
     <section id="faq" className="mt-6 p-6 bg-white shadow-sm">
       <h2 className="text-2xl font-bold mb-4">FAQ</h2>

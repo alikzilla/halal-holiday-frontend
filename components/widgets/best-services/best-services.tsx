@@ -36,7 +36,7 @@ const BestServices = () => {
                 <Heading6 className="text-[#222222]">Hotel</Heading6>
               </div>
 
-              <Heading4 className="w-[220px]">Find Your Perfect Stay</Heading4>
+              <Heading4 className="text-[#fff] w-[220px]">Find Your Perfect Stay</Heading4>
             </div>
 
             {/* Tour */}
@@ -52,7 +52,7 @@ const BestServices = () => {
                 <Heading6 className="text-[#222222]">Tour</Heading6>
               </div>
 
-              <Heading4 className="w-[220px]">
+              <Heading4 className="text-[#fff] w-[220px]">
                 Explore Stunning Destinations
               </Heading4>
             </div>
@@ -70,7 +70,7 @@ const BestServices = () => {
                 <Heading6 className="text-[#222222]">Rent a Car</Heading6>
               </div>
 
-              <Heading4 className="w-[220px]">Rent the Perfect Ride</Heading4>
+              <Heading4 className="text-[#fff] w-[220px]">Rent the Perfect Ride</Heading4>
             </div>
 
             {/* Flights */}
@@ -86,7 +86,7 @@ const BestServices = () => {
                 <Heading6 className="text-[#222222]">Flights</Heading6>
               </div>
 
-              <Heading4 className="w-[220px]">
+              <Heading4 className="text-[#fff] w-[220px]">
                 Book Your Next Flight Effortlessly
               </Heading4>
             </div>
@@ -104,7 +104,7 @@ const BestServices = () => {
                 <Heading6 className="text-[#222222]">Transfers</Heading6>
               </div>
 
-              <Heading4 className="w-[220px]">
+              <Heading4 className="text-[#fff] w-[220px]">
                 Enjoy Hassle-Free Transfers
               </Heading4>
             </div>
@@ -122,7 +122,7 @@ const BestServices = () => {
                 <Heading6 className="text-[#222222]">Activities</Heading6>
               </div>
 
-              <Heading4 className="w-[220px]">Adventure Awaits</Heading4>
+              <Heading4 className="text-[#fff] w-[220px]">Adventure Awaits</Heading4>
             </div>
           </div>
         </section>

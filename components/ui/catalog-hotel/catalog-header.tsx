@@ -1,6 +1,8 @@
 "use client";
 
+import { Heading5 } from "@/components/common";
 import React, { useState } from "react";
+import Button from "../button/button";
 
 const CatalogHeader = ({
   onLayoutChange,
@@ -16,20 +18,28 @@ const CatalogHeader = ({
 
   return (
     <div className="flex justify-between items-center mb-4">
-      <span>1,397 properties found</span>
+      <span className="inline-flex gap-1">
+        <Heading5 className="text-[#222]">1,397</Heading5> properties found
+      </span>
       <div className="flex space-x-2">
-        <button
+        <Button
+          justIcon
+          type={layout === "grid" ? "primary" : "secondary"}
+          trailingIcon
+          trailing={layout === "grid" ? "widget-white" : "widget"}
           onClick={() => handleLayoutChange("grid")}
-          className={`p-2 ${layout === "grid" ? "bg-gray-200" : "bg-white"}`}
         >
           Grid
-        </button>
-        <button
+        </Button>
+        <Button
+          justIcon
+          type={layout === "flex" ? "primary" : "secondary"}
+          trailingIcon
+          trailing={layout === "flex" ? "hamburger-white" : "hamburger"}
           onClick={() => handleLayoutChange("flex")}
-          className={`p-2 ${layout === "flex" ? "bg-gray-200" : "bg-white"}`}
         >
           Flex
-        </button>
+        </Button>
       </div>
     </div>
   );

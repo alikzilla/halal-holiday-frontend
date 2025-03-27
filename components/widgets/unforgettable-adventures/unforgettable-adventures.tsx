@@ -158,7 +158,7 @@ const AdventuresSection = () => {
                 </div>
 
                 {/* Title and Description */}
-                <Heading4>{adventure.title}</Heading4>
+                <Heading4 className="text-[#fff] ">{adventure.title}</Heading4>
                 <Body2>{adventure.description}</Body2>
               </div>
             ))}

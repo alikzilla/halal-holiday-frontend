@@ -85,8 +85,8 @@ const Header = ({ isTransparent = false }: { isTransparent?: boolean }) => {
                 className="flex items-center gap-2"
               >
                 <Image
-                  src="/assets/icons/currency.svg"
-                  alt="currency"
+                  src={`/assets/icons/currency-${selectedCurrency.toLowerCase()}-white.svg`}
+                  alt={selectedCurrency}
                   width={20}
                   height={20}
                 />
@@ -163,7 +163,7 @@ const Header = ({ isTransparent = false }: { isTransparent?: boolean }) => {
             </Button>
             <Button type="secondary">Login</Button>
             <Image
-              src="/assets/icons/hamburger.svg"
+              src="/assets/icons/hamburger-white.svg"
               alt="hamburger"
               width={24}
               height={24}

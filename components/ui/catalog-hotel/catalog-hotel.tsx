@@ -17,7 +17,7 @@ const CatalogHotel = ({
           {hotels.map((hotel, index) => (
             <HotelCardType1
               key={index}
-              id={index}
+              id={hotel.id}
               name={hotel.name}
               location={hotel.location}
               duration={hotel.duration}
@@ -32,7 +32,7 @@ const CatalogHotel = ({
           {hotels.map((hotel, index) => (
             <HotelCardType2
               key={index}
-              id={index}
+              id={hotel.id}
               name={hotel.name}
               location={hotel.location}
               duration={hotel.duration}

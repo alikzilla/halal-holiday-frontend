@@ -9,7 +9,7 @@ const Title1 = ({
   className?: string;
 }) => {
   return (
-    <p className={cn("text-white text-[14px] font-semibold", className)}>
+    <p className={cn("text-[#222] text-[14px] font-semibold", className)}>
       {children}
     </p>
   );

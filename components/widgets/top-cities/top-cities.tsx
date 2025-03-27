@@ -24,7 +24,7 @@ const TopCities = () => {
             >
               <div className="absolute z-[-1] bottom-0 left-0 w-full h-1/3 backdrop-blur-lg mask-gradient rounded-lg"></div>
 
-              <Heading4 className="w-[220px]">Istanbul, Turkey</Heading4>
+              <Heading4 className="text-[#fff] w-[220px]">Istanbul, Turkey</Heading4>
             </div>
 
             {/* Tour */}
@@ -36,7 +36,7 @@ const TopCities = () => {
             >
               <div className="absolute z-[-1] bottom-0 left-0 w-full h-1/3 backdrop-blur-lg mask-gradient rounded-lg"></div>
 
-              <Heading4 className="w-[220px]">Tokyo, Japan</Heading4>
+              <Heading4 className="text-[#fff] w-[220px]">Tokyo, Japan</Heading4>
             </div>
 
             {/* Rent a Car */}
@@ -48,7 +48,7 @@ const TopCities = () => {
             >
               <div className="absolute z-[-1] bottom-0 left-0 w-full h-1/3 backdrop-blur-lg mask-gradient rounded-lg"></div>
 
-              <Heading4 className="w-[220px]">New York, USA</Heading4>
+              <Heading4 className="text-[#fff] w-[220px]">New York, USA</Heading4>
             </div>
 
             {/* Flights */}
@@ -60,7 +60,7 @@ const TopCities = () => {
             >
               <div className="absolute z-[-1] bottom-0 left-0 w-full h-1/3 backdrop-blur-lg mask-gradient rounded-lg"></div>
 
-              <Heading4 className="w-[220px]">Paris, France</Heading4>
+              <Heading4 className="text-[#fff] w-[220px]">Paris, France</Heading4>
             </div>
 
             {/* Transfer */}
@@ -72,7 +72,7 @@ const TopCities = () => {
             >
               <div className="absolute z-[-1] bottom-0 left-0 w-full h-1/3 backdrop-blur-lg mask-gradient rounded-lg"></div>
 
-              <Heading4 className="w-[220px]">Sydney, Australia</Heading4>
+              <Heading4 className="text-[#fff] w-[220px]">Sydney, Australia</Heading4>
             </div>
 
             {/* Activities */}
@@ -84,7 +84,7 @@ const TopCities = () => {
             >
               <div className="absolute z-[-1] bottom-0 left-0 w-full h-1/3 backdrop-blur-lg mask-gradient rounded-lg"></div>
 
-              <Heading4 className="w-[220px]">London, UK</Heading4>
+              <Heading4 className="text-[#fff] w-[220px]">London, UK</Heading4>
             </div>
           </div>
         </section>

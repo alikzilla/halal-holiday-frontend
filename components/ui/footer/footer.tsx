@@ -13,7 +13,7 @@ import logo from "../../../public/logo.svg";
 
 const Footer = () => {
   return (
-    <footer className="bg-[var(--background)] py-[60px]">
+    <footer className="bg-[var(--primary)] py-[60px]">
       <Container>
         <section className="flex items-center justify-between gap-6">
           <div className="flex flex-col items-start justify-start gap-8">
@@ -61,7 +61,7 @@ const Footer = () => {
           <div className="flex flex-col items-start gap-[72px]">
             <nav className="flex items-start justify-start gap-[60px]">
               <div className="flex flex-col items-start gap-4">
-                <Heading4 className="cursor-pointer">About Us</Heading4>
+                <Heading4 className="text-[#fff] cursor-pointer">About Us</Heading4>
                 <Title1 className="text-[#769190] cursor-pointer transition-all duration-300 hover:text-white">
                   Our Story
                 </Title1>
@@ -76,7 +76,7 @@ const Footer = () => {
                 </Title1>
               </div>
               <div className="flex flex-col items-start gap-4">
-                <Heading4 className="cursor-pointer">Customer Support</Heading4>
+                <Heading4 className="text-[#fff] cursor-pointer">Customer Support</Heading4>
                 <Title1 className="text-[#769190] cursor-pointer transition-all duration-300 hover:text-white">
                   FAQs
                 </Title1>
@@ -91,7 +91,7 @@ const Footer = () => {
                 </Title1>
               </div>
               <div className="flex flex-col items-start gap-4">
-                <Heading4 className="cursor-pointer">Legal</Heading4>
+                <Heading4 className="text-[#fff] cursor-pointer">Legal</Heading4>
                 <Title1 className="text-[#769190] cursor-pointer transition-all duration-300 hover:text-white">
                   Terms & Conditions
                 </Title1>

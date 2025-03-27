@@ -5,26 +5,23 @@ export interface IHotel {
   duration: string;
   bedType: string;
   price: number;
-  taxesIncluded: boolean;
   discountedPrice?: number;
+  taxesIncluded: boolean;
   features?: string[];
   roomsLeft?: number;
   isMostBooked?: boolean;
-}
-
-export interface Hotel {
-  slug: string;
-  name: string;
-  address: string;
-  rating: number;
-  images: string[];
-  description: string;
-  rooms: Room[];
-  reviews: Review[];
-  surroundings: string[];
-  facilities: string[];
-  thingsToKnow: string[];
-  faqs: FAQ[];
+  address?: string;
+  rating?: number;
+  images?: string[];
+  description?: string;
+  rooms?: Room[];
+  reviews?: Review[];
+  surroundings?: string[];
+  facilities?: string[];
+  thingsToKnow?: string[];
+  faqs?: FAQ[];
+  guests?: string;
+  tag?: string;
 }
 
 interface Room {
@@ -37,6 +34,7 @@ interface Review {
   user: string;
   rating: number;
   comment: string;
+  date?: string;
 }
 
 interface FAQ {

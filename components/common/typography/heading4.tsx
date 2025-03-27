@@ -11,7 +11,7 @@ const Heading4 = ({
   return (
     <h2
       className={cn(
-        "text-white text-[20px] font-semibold leading-[120%]",
+        "text-[#222] text-[20px] font-semibold leading-[120%]",
         className
       )}
     >

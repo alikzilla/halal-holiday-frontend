@@ -2,6 +2,7 @@
 
 import React from "react";
 import { useSearchParams, useRouter } from "next/navigation";
+import Button from "../button/button";
 
 const FilterHeader = () => {
   const searchParams = useSearchParams();
@@ -46,18 +47,15 @@ const FilterHeader = () => {
   return (
     <div className="flex flex-wrap items-center gap-2 mb-4">
       {allFilters.map((filter, index) => (
-        <div
+        <Button
           key={index}
-          className="flex items-center bg-gray-100 rounded-full px-3 py-1 text-sm"
+          type="outline"
+          onClick={() => handleRemoveFilter(filter)}
+          trailingIcon
+          trailing="cross-green"
         >
           <span>{filter}</span>
-          <button
-            onClick={() => handleRemoveFilter(filter)}
-            className="ml-2 text-gray-500 hover:text-gray-700"
-          >
-            &times;
-          </button>
-        </div>
+        </Button>
       ))}
     </div>
   );

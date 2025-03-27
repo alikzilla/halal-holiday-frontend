@@ -12,6 +12,7 @@ interface IButtonProps {
     | "black"
     | "white"
     | "tertiary"
+    | "outline"
     | "gradient"
     | "transparent";
   justIcon?: boolean;
@@ -52,6 +53,8 @@ const Button: FC<IButtonProps> = ({
       "bg-[var(--black)] text-[var(--black-foreground)] hover:bg-[var(--black-hover)] active:bg-[var(--black-active)]",
     white:
       "bg-[var(--white)] text-[var(--white-foreground)] hover:bg-[var(--white-hover)] active:bg-[var(--white-active)]",
+    outline:
+      "bg-[#E4ECEC] text-[#266462] border border-[#AEC6C5] hover:bg-white hover:text-[#266462] active:bg-[#266462]",
     tertiary:
       "bg-[var(--tertiary)] text-[var(--tertiary-foreground)] hover:bg-[var(--tertiary-hover)] active:bg-[var(--tertiary-active)]",
     gradient:
@@ -71,6 +74,7 @@ const Button: FC<IButtonProps> = ({
         alt={name}
         width={size === "md" ? 20 : 16}
         height={size === "md" ? 20 : 16}
+        style={{ pointerEvents: "none" }}
       />
     );
   };
