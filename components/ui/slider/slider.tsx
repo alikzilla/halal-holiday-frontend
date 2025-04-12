@@ -3,7 +3,7 @@
 import * as React from "react";
 import * as SliderPrimitive from "@radix-ui/react-slider";
 
-import { cn } from "@/lib/utils";
+import { cn } from "@/core/lib/utils";
 
 function Slider({
   className,
@@ -53,7 +53,7 @@ function Slider({
         <SliderPrimitive.Thumb
           data-slot="slider-thumb"
           key={index}
-          className="relative group border-[var(--primary)] bg-white ring-[var(--primary)]/50 block size-4 shrink-0 rounded-full border shadow-sm transition-[color,box-shadow] hover:ring-2 focus-visible:ring-4 focus-visible:outline-hidden disabled:pointer-events-none disabled:opacity-50"
+          className="relative group  cursor-pointer border-[var(--primary)] bg-white ring-[var(--primary)]/50 block size-4 shrink-0 rounded-full border shadow-sm transition-[color,box-shadow] hover:ring-2 focus-visible:ring-4 focus-visible:outline-hidden disabled:pointer-events-none disabled:opacity-50"
         >
           <div
             className={cn(

@@ -1,5 +1,5 @@
 import { ReactNode } from "react";
-import { Footer, Header } from "@/components/ui";
+import { Footer, Header } from "@/components/common";
 
 const MainLayout = ({
   children,

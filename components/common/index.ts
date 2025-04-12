@@ -13,3 +13,6 @@ export { default as Heading6 } from "./typography/heading6";
 
 export { default as MainLayout } from "./layout/main-layout";
 export { default as Container } from "./layout/container";
+
+export { default as Header } from "./header/header";
+export { default as Footer } from "./footer/footer";

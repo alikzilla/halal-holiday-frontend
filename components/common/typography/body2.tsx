@@ -1,4 +1,4 @@
-import { cn } from "@/lib/utils";
+import { cn } from "@/core/lib/utils";
 import React, { ReactNode } from "react";
 
 const Title2 = ({
@@ -11,7 +11,7 @@ const Title2 = ({
   return (
     <p
       className={cn(
-        "text-white text-[12px] font-semibold leading-[147%]",
+        "text-white text-[12px] font-medium leading-[147%]",
         className
       )}
     >

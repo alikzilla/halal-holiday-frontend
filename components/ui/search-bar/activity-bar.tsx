@@ -1,8 +1,10 @@
+"use client";
+
 import { useState } from "react";
-import Button from "../button/button";
 import Image from "next/image";
 import { Heading6, Title1, Title2 } from "@/components/common";
-import { cn } from "@/lib/utils";
+import Button from "../button/button";
+import { cn } from "@/core/lib/utils";
 
 const ActivitySearchBar = () => {
   const [isFromModalOpen, setIsFromModalOpen] = useState(false);

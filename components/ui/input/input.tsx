@@ -11,8 +11,8 @@ interface Input {
   required?: boolean;
   className?: string;
   readOnly?: boolean;
-  min: number;
-  max: number;
+  min?: number;
+  max?: number;
 }
 
 const Input: React.FC<Input> = ({
