@@ -3,12 +3,12 @@
 import { usePathname, useRouter } from "next/navigation";
 import Button from "../button/button";
 
-import FlightSearchBar from "./flight-bar";
-import RentCarSearchBar from "./rent-car-bar";
-import HotelSearchBar from "./hotel-bar";
-import TourSearchBar from "./tour-bar";
-import TransferSearchBar from "./transfer-bar";
-import ActivitySearchBar from "./activity-bar";
+import FlightSearchBar from "../../../features/flight/components/flight-bar/flight-bar";
+import RentCarSearchBar from "../../../features/rent-car/components/rent-car-bar/rent-car-bar";
+import HotelSearchBar from "../../../features/hotel/components/hotel-bar/hotel-bar";
+import TourSearchBar from "../../../features/tour/components/tour-bar/tour-bar";
+import TransferSearchBar from "../../../features/transfer/components/transfer-bar/transfer-bar";
+import ActivitySearchBar from "../../../features/activity/components/activity-bar/activity-bar";
 
 const tabItems = [
   {

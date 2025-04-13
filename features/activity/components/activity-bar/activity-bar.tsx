@@ -3,15 +3,17 @@
 import { useState } from "react";
 import Image from "next/image";
 import { Heading6, Title1, Title2 } from "@/components/common";
-import Button from "../button/button";
+import { Button } from "@/components/ui";
 import { cn } from "@/core/lib/utils";
 
-const TourSearchBar = () => {
+const ActivitySearchBar = () => {
   const [isFromModalOpen, setIsFromModalOpen] = useState(false);
+  const [isToModalOpen, setIsToModalOpen] = useState(false);
   const [isDateModalOpen, setIsDateModalOpen] = useState(false);
   const [isGuestsModalOpen, setIsGuestsModalOpen] = useState(false);
 
   const [fromDestination, setFromDestination] = useState("");
+  const [toDestination, setToDestination] = useState("");
   const [checkInDate, setCheckInDate] = useState("");
   const [checkOutDate, setCheckOutDate] = useState("");
   const [guests, setGuests] = useState<{
@@ -22,11 +24,20 @@ const TourSearchBar = () => {
   }>({ adults: 0, children: 0, infants: 0, pets: 0 });
 
   // const openFromModal = () => setIsFromModalOpen(true);
+  const openToModal = () => setIsToModalOpen(true);
   const openDateModal = () => setIsDateModalOpen(true);
   const openGuestsModal = () => setIsGuestsModalOpen(true);
 
   const toggleFromModal = () => {
     setIsFromModalOpen(!isFromModalOpen);
+    closeToModal();
+    closeDateModal();
+    closeGuestsModal();
+  };
+
+  const toggleToModal = () => {
+    setIsToModalOpen(!isToModalOpen);
+    closeFromModal();
     closeDateModal();
     closeGuestsModal();
   };
@@ -34,22 +45,31 @@ const TourSearchBar = () => {
   const toggleDateModal = () => {
     setIsDateModalOpen(!isDateModalOpen);
     closeFromModal();
+    closeToModal();
     closeGuestsModal();
   };
 
   const toggleGuestsModal = () => {
     setIsGuestsModalOpen(!isGuestsModalOpen);
     closeFromModal();
+    closeToModal();
     closeDateModal();
   };
 
   const closeFromModal = () => setIsFromModalOpen(false);
+  const closeToModal = () => setIsToModalOpen(false);
   const closeDateModal = () => setIsDateModalOpen(false);
   const closeGuestsModal = () => setIsGuestsModalOpen(false);
 
   const handleFromDestinationSelect = (destination: string) => {
     setFromDestination(destination);
     closeFromModal();
+    openToModal();
+  };
+
+  const handleToDestinationSelect = (destination: string) => {
+    setToDestination(destination);
+    closeToModal();
     openDateModal();
   };
 
@@ -71,7 +91,7 @@ const TourSearchBar = () => {
   };
 
   return (
-    <div className="w-full py-4">
+    <div className="w-full">
       <div className="flex w-full items-center justify-between gap-4">
         {/* From Destination Button */}
         <div className="relative flex-1 z-43">
@@ -87,7 +107,7 @@ const TourSearchBar = () => {
               className="bg-[#F9F9F9] rounded-full p-2"
             />
             <div className="flex flex-col">
-              <Heading6 className="text-[#ADADAD]">Where</Heading6>
+              <Heading6 className="text-[#ADADAD]">From</Heading6>
               <Heading6 className="text-[#4C4C4C]">
                 {fromDestination || "Select destination"}
               </Heading6>
@@ -99,6 +119,36 @@ const TourSearchBar = () => {
               title="Select From Destination"
               onClose={closeFromModal}
               onSelect={handleFromDestinationSelect}
+            />
+          )}
+        </div>
+
+        {/* To Destination Button */}
+        <div className="relative flex-1 z-43">
+          <div
+            className="flex items-center gap-2 rounded-full cursor-pointer transition-all duration-300 hover:bg-gray-100"
+            onClick={toggleToModal}
+          >
+            <Image
+              src={"/assets/icons/location.svg"}
+              alt={"location"}
+              width={44}
+              height={44}
+              className="bg-[#F9F9F9] rounded-full p-2"
+            />
+            <div className="flex flex-col">
+              <Heading6 className="text-[#ADADAD]">To</Heading6>
+              <Heading6 className="text-[#4C4C4C]">
+                {toDestination || "Select destination"}
+              </Heading6>
+            </div>
+          </div>
+
+          {isToModalOpen && (
+            <Modal
+              title="Select To Destination"
+              onClose={closeToModal}
+              onSelect={handleToDestinationSelect}
             />
           )}
         </div>
@@ -117,11 +167,13 @@ const TourSearchBar = () => {
               className="bg-[#F9F9F9] rounded-full p-2"
             />
             <div className="flex flex-col">
-              <Heading6 className="text-[#ADADAD]">Tour Date/Time</Heading6>
+              <Heading6 className="text-[#ADADAD]">
+                Check in / Check out
+              </Heading6>
               <Heading6 className="text-[#4C4C4C]">
                 {checkInDate && checkOutDate
                   ? `${checkInDate} - ${checkOutDate}`
-                  : "Add dates"}
+                  : "Select dates"}
               </Heading6>
             </div>
           </div>
@@ -1003,4 +1055,4 @@ const GuestsModal = ({
   );
 };
 
-export default TourSearchBar;
+export default ActivitySearchBar;

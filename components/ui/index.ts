@@ -13,9 +13,3 @@ export { default as Breadcrumb } from "./breadcrumb/breadcrumb";
 
 // Search bar
 export { default as SearchBar } from "./search-bar/search-bar";
-export { default as HotelSearchBar } from "./search-bar/hotel-bar";
-export { default as FlightsSearchBar } from "./search-bar/flight-bar";
-export { default as RentCarSearchBar } from "./search-bar/rent-car-bar";
-export { default as TourSearchBar } from "./search-bar/tour-bar";
-export { default as TransferSearchBar } from "./search-bar/transfer-bar";
-export { default as ActivitySearchBar } from "./search-bar/activity-bar";

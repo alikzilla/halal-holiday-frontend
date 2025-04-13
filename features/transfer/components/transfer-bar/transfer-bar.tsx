@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Image from "next/image";
 import { Heading6, Title1, Title2 } from "@/components/common";
-import Button from "../button/button";
+import { Button } from "@/components/ui";
 import { cn } from "@/core/lib/utils";
 
 const TransferSearchBar = () => {
