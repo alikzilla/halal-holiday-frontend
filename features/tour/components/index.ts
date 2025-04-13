@@ -15,3 +15,4 @@ export { default as CatalogTour } from "./catalog-tour/catalog-tour";
 export { default as TourCard } from "./catalog-items/catalog-item";
 export { default as FilterHeader } from "./filter-header/filter-header";
 export { default as FilterTour } from "./filter-tour/filter-tour";
+export { default as TourSearchBar } from "./tour-bar/tour-bar";

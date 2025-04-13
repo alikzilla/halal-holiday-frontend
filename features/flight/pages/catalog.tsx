@@ -1,12 +1,13 @@
 "use client";
 
 import { Container, MainLayout as Layout } from "@/components/common";
-import { Breadcrumb, HotelSearchBar } from "@/components/ui";
+import { Breadcrumb } from "@/components/ui";
 import {
   CatalogHotel,
   FilterHotel,
   FilterHeader,
   CatalogHeader,
+  HotelSearchBar,
 } from "@/features/hotel/components";
 import { Suspense, useState } from "react";
 import { hotels } from "@/core/lib/globals";

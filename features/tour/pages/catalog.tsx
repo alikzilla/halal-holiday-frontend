@@ -2,8 +2,13 @@
 
 import { Suspense } from "react";
 import { Container, MainLayout as Layout } from "@/components/common";
-import { Breadcrumb, TourSearchBar } from "@/components/ui";
-import { FilterTour, CatalogTour, FilterHeader } from "../components";
+import { Breadcrumb } from "@/components/ui";
+import {
+  FilterTour,
+  CatalogTour,
+  FilterHeader,
+  TourSearchBar,
+} from "../components";
 import { hotels } from "@/core/lib/globals";
 
 const Tours = () => {

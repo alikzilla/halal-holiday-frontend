@@ -20,3 +20,4 @@ export { default as HotelCard1 } from "./catalog-items/catalog-item1";
 export { default as HotelCard2 } from "./catalog-items/catalog-item2";
 export { default as FilterHeader } from "./filter-header/filter-header";
 export { default as FilterHotel } from "./filter-hotel/filter-hotel";
+export { default as HotelSearchBar } from "./hotel-bar/hotel-bar";

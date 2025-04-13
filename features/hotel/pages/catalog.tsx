@@ -2,12 +2,13 @@
 
 import { Suspense, useState } from "react";
 import { Container, MainLayout as Layout } from "@/components/common";
-import { Breadcrumb, HotelSearchBar } from "@/components/ui";
+import { Breadcrumb } from "@/components/ui";
 import {
   CatalogHeader,
   FilterHotel,
   CatalogHotel,
   FilterHeader,
+  HotelSearchBar,
 } from "../components";
 import { hotels } from "@/core/lib/globals";
 
