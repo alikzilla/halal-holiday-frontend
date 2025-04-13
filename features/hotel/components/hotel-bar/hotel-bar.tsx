@@ -5,15 +5,7 @@ import Image from "next/image";
 import { Heading6, Title1, Title2 } from "@/components/common";
 import { Button } from "@/components/ui";
 import { cn } from "@/core/lib/utils";
-import {
-  City,
-  Country,
-  Province,
-  useCities,
-  useCountries,
-  useProvinces,
-  useRegions,
-} from "@/core/hooks/use-locations";
+import { useLocations } from "@/core/hooks/use-locations";
 
 const HotelSearchBar = () => {
   const [isFromModalOpen, setIsFromModalOpen] = useState(false);
@@ -250,297 +242,85 @@ const Modal = ({
   onSelect: (value: string) => void;
 }) => {
   const [searchQuery, setSearchQuery] = useState("");
-  const [selectedCountry, setSelectedCountry] = useState<Country | null>(null);
-  const [selectedProvince, setSelectedProvince] = useState<Province | null>(
-    null
-  );
-  const [selectedCity, setSelectedCity] = useState<City | null>(null);
-  const [breadcrumbs, setBreadcrumbs] = useState<
-    { id: number; name: string; type: string }[]
-  >([]);
-
-  // Fetch location data using hooks
-  const { countries, loading: countriesLoading } = useCountries();
-  const { provinces, loading: provincesLoading } = useProvinces(
-    selectedCountry?.id || 0
-  );
-  const { cities, loading: citiesLoading } = useCities(
-    selectedProvince?.id || 0
-  );
-  const { regions, loading: regionsLoading } = useRegions(
-    selectedCity?.id || 0
-  );
-
-  // Combined loading state
-  const loading =
-    countriesLoading ||
-    (selectedCountry && provincesLoading) ||
-    (selectedProvince && citiesLoading) ||
-    (selectedCity && regionsLoading);
-
-  // Handle country selection
-  const handleCountrySelect = (country: Country) => {
-    setSelectedCountry(country);
-    setSelectedProvince(null);
-    setSelectedCity(null);
-    setBreadcrumbs([{ id: country.id, name: country.title, type: "country" }]);
-  };
-
-  // Handle province selection
-  const handleProvinceSelect = (province: Province) => {
-    setSelectedProvince(province);
-    setSelectedCity(null);
-    setBreadcrumbs([
-      {
-        id: selectedCountry!.id,
-        name: selectedCountry!.title,
-        type: "country",
-      },
-      { id: province.id, name: province.title, type: "province" },
-    ]);
-  };
-
-  // Handle city selection
-  const handleCitySelect = (city: City) => {
-    setSelectedCity(city);
-    setBreadcrumbs([
-      {
-        id: selectedCountry!.id,
-        name: selectedCountry!.title,
-        type: "country",
-      },
-      {
-        id: selectedProvince!.id,
-        name: selectedProvince!.title,
-        type: "province",
-      },
-      { id: city.id, name: city.title, type: "city" },
-    ]);
-  };
-
-  // Handle region selection
-  const handleRegionSelect = (regionName: string) => {
-    onSelect(regionName);
-    onClose();
-  };
-
-  // Handle navigation in breadcrumbs
-  const handleBreadcrumbClick = (item: { id: number; type: string }) => {
-    if (item.type === "country") {
-      setSelectedCountry(null);
-      setSelectedProvince(null);
-      setSelectedCity(null);
-      setBreadcrumbs([]);
-    } else if (item.type === "province") {
-      setSelectedProvince(null);
-      setSelectedCity(null);
-      setBreadcrumbs(breadcrumbs.slice(0, 1));
-    } else if (item.type === "city") {
-      setSelectedCity(null);
-      setBreadcrumbs(breadcrumbs.slice(0, 2));
-    }
-  };
+  const { locations, loading, error } = useLocations();
 
   // Filter locations based on search query
   const filteredLocations = useMemo(() => {
-    if (!searchQuery) return [];
+    if (!searchQuery) return locations;
 
-    const allLocations = [
-      ...countries.map((c) => ({ ...c, type: "country" })),
-      ...provinces.map((p) => ({ ...p, type: "province" })),
-      ...cities.map((c) => ({ ...c, type: "city" })),
-      ...regions.map((r) => ({ ...r, type: "region" })),
-    ];
-
-    return allLocations
-      .filter((loc) =>
-        loc.title.toLowerCase().includes(searchQuery.toLowerCase())
-      )
-      .slice(0, 5);
-  }, [searchQuery, countries, provinces, cities, regions]);
-
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const renderLocationItems = (locations: any[], type: string) => {
-    return locations.map((location) => (
-      <div
-        key={`${type}-${location.id}`}
-        className="flex items-center justify-start gap-2 rounded-full hover:bg-gray-100 cursor-pointer p-2"
-        onClick={() => {
-          if (type === "country") {
-            handleCountrySelect(location);
-          } else if (type === "province") {
-            handleProvinceSelect(location);
-          } else if (type === "city") {
-            handleCitySelect(location);
-          } else if (type === "region") {
-            handleRegionSelect(location.title);
-          }
-        }}
-      >
-        <Image
-          src={"/assets/icons/location.svg"}
-          alt={"location"}
-          width={44}
-          height={44}
-          className="bg-[#F9F9F9] rounded-full p-2"
-        />
-        <div>
-          <p className="font-medium">{location.title}</p>
-          <p className="text-sm text-gray-500 capitalize">{type}</p>
-        </div>
-      </div>
-    ));
-  };
-
-  // Render content based on current state
-  const renderContent = () => {
-    if (loading && !selectedCountry && !selectedProvince && !selectedCity) {
-      return (
-        <div className="space-y-3">
-          {Array.from({ length: 5 }).map((_, index) => (
-            <div
-              key={index}
-              className="flex items-center justify-start gap-2 rounded-full"
-            >
-              <div className="bg-[#F9F9F9] rounded-full p-2 w-[44px] h-[44px] animate-pulse" />
-              <div className="space-y-2">
-                <div className="h-4 w-32 bg-gray-200 rounded animate-pulse" />
-                <div className="h-3 w-16 bg-gray-100 rounded animate-pulse" />
-              </div>
-            </div>
-          ))}
-        </div>
-      );
-    }
-
-    if (searchQuery) {
-      return (
-        <div className="space-y-3 max-h-[300px] overflow-y-auto">
-          {filteredLocations.length > 0 ? (
-            filteredLocations.map((location) => (
-              <div
-                key={`${location.type}-${location.id}`}
-                className="flex items-center justify-start gap-2 rounded-full hover:bg-gray-100 cursor-pointer p-2"
-                onClick={() => {
-                  if (location.type === "region") {
-                    handleRegionSelect(location.title);
-                  } else {
-                    // For other types, navigate to that level
-                    if (location.type === "country")
-                      handleCountrySelect(location);
-                    if (location.type === "province")
-                      handleProvinceSelect(location);
-                    if (location.type === "city") handleCitySelect(location);
-                    setSearchQuery("");
-                  }
-                }}
-              >
-                <Image
-                  src={"/assets/icons/location.svg"}
-                  alt={"location"}
-                  width={44}
-                  height={44}
-                  className="bg-[#F9F9F9] rounded-full p-2"
-                />
-                <div>
-                  <p className="font-medium">{location.title}</p>
-                  <p className="text-sm text-gray-500 capitalize">
-                    {location.type}
-                  </p>
-                </div>
-              </div>
-            ))
-          ) : (
-            <p className="text-gray-500 text-center py-4">No locations found</p>
-          )}
-        </div>
-      );
-    }
-
-    return (
-      <div className="space-y-3 max-h-[300px] overflow-y-auto">
-        {/* Breadcrumbs */}
-        {breadcrumbs.length > 0 && (
-          <div className="flex gap-2 items-center text-sm mb-4">
-            <span
-              className="text-gray-500 cursor-pointer hover:underline"
-              onClick={() => {
-                setSelectedCountry(null);
-                setSelectedProvince(null);
-                setSelectedCity(null);
-                setBreadcrumbs([]);
-              }}
-            >
-              All Countries
-            </span>
-            {breadcrumbs.map((item, index) => (
-              <div key={item.id} className="flex items-center">
-                <span className="mx-1">/</span>
-                <span
-                  className={`${
-                    index === breadcrumbs.length - 1
-                      ? "font-medium"
-                      : "text-gray-500 cursor-pointer hover:underline"
-                  }`}
-                  onClick={() =>
-                    index < breadcrumbs.length - 1
-                      ? handleBreadcrumbClick(item)
-                      : null
-                  }
-                >
-                  {item.name}
-                </span>
-              </div>
-            ))}
-          </div>
-        )}
-
-        {/* Current level locations */}
-        {selectedCity && renderLocationItems(regions, "region")}
-        {selectedProvince &&
-          !selectedCity &&
-          renderLocationItems(cities, "city")}
-        {selectedCountry &&
-          !selectedProvince &&
-          renderLocationItems(provinces, "province")}
-        {!selectedCountry && renderLocationItems(countries, "country")}
-
-        {countries.length === 0 && !loading && (
-          <p className="text-gray-500 text-center py-4">
-            No locations available
-          </p>
-        )}
-      </div>
+    const query = searchQuery.toLowerCase();
+    return locations.filter(
+      (location) =>
+        location.city.toLowerCase().includes(query) ||
+        location.country.toLowerCase().includes(query) ||
+        location.fullName.toLowerCase().includes(query)
     );
-  };
+  }, [searchQuery, locations]);
 
   return (
     <div className="absolute top-[80px] flex items-center justify-center z-50">
-      <div className="bg-white p-4 rounded-lg w-[388px] shadow-lg">
+      <div className="bg-white p-4 rounded-lg w-[388px] shadow-lg max-h-[80vh] overflow-hidden">
         {/* Search Input */}
         <input
           type="text"
-          placeholder="Search destination"
+          placeholder="Search city or country"
           className="w-full px-3 py-4 border border-[#F2F2F2] rounded-xl mb-4"
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           onKeyDown={(e) => e.key === "Enter" && onClose()}
         />
 
-        {!searchQuery && (
-          <Title1 className="text-black mb-6">
-            {selectedCity
-              ? "Select Region"
-              : selectedProvince
-              ? "Select City"
-              : selectedCountry
-              ? "Select Province"
-              : "Select Country"}
-          </Title1>
-        )}
+        <Title1 className="text-black mb-6">All Cities</Title1>
 
         {/* Content */}
-        {renderContent()}
+        <div className="space-y-3 max-h-[60vh] overflow-y-auto">
+          {loading ? (
+            // Loading state
+            Array.from({ length: 10 }).map((_, index) => (
+              <div
+                key={index}
+                className="flex items-center justify-start gap-2 rounded-full"
+              >
+                <div className="bg-[#F9F9F9] rounded-full p-2 w-[44px] h-[44px] animate-pulse" />
+                <div className="space-y-2">
+                  <div className="h-4 w-32 bg-gray-200 rounded animate-pulse" />
+                  <div className="h-3 w-16 bg-gray-100 rounded animate-pulse" />
+                </div>
+              </div>
+            ))
+          ) : error ? (
+            // Error state
+            <p className="text-red-500 text-center py-4">{error}</p>
+          ) : filteredLocations.length > 0 ? (
+            // Locations list
+            filteredLocations.map((location, index) => (
+              <div
+                key={`${location.city}-${index}`}
+                className="flex items-center justify-start gap-2 rounded-full hover:bg-gray-100 cursor-pointer p-2"
+                onClick={() => onSelect(location.fullName)}
+              >
+                <Image
+                  src="/assets/icons/location.svg"
+                  alt="location"
+                  width={44}
+                  height={44}
+                  className="bg-[#F9F9F9] rounded-full p-2"
+                />
+                <div>
+                  <p className="font-medium">{location.city}</p>
+                  <p className="text-sm text-gray-500">{location.country}</p>
+                </div>
+              </div>
+            ))
+          ) : (
+            // No results
+            <p className="text-gray-500 text-center py-4">
+              {locations.length === 0
+                ? "No cities available"
+                : "No matching cities found"}
+            </p>
+          )}
+        </div>
       </div>
     </div>
   );

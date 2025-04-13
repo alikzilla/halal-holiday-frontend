@@ -2,26 +2,15 @@ import { useState, useEffect } from "react";
 
 const API = process.env.NEXT_PUBLIC_API;
 
-export interface Country {
-  id: number;
-  oid: number;
-  title: string;
-  is_top: 0 | 1;
-}
-
-export interface Province {
+interface Country {
   id: number;
   title: string;
 }
 
-export interface City {
+interface City {
   id: number;
   title: string;
-}
-
-export interface Region {
-  id: number;
-  title: string;
+  country_id: number;
 }
 
 export const useCountries = () => {
@@ -33,9 +22,7 @@ export const useCountries = () => {
     const fetchCountries = async () => {
       try {
         const response = await fetch(`${API}/main/locations/countries`);
-        if (!response.ok) {
-          throw new Error("Failed to fetch countries");
-        }
+        if (!response.ok) throw new Error("Failed to fetch countries");
         const data = await response.json();
         setCountries(data.data.countries);
       } catch (err) {
@@ -51,65 +38,50 @@ export const useCountries = () => {
   return { countries, loading, error };
 };
 
-export const useProvinces = (countryId: number) => {
-  const [provinces, setProvinces] = useState<Province[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    const fetchProvinces = async () => {
-      try {
-        const response = await fetch(`${API}/main/locations/provinces`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ countryID: countryId }),
-        });
-
-        if (!response.ok) {
-          throw new Error("Failed to fetch provinces");
-        }
-
-        const data = await response.json();
-        setProvinces(data.data);
-      } catch (err) {
-        setError(err instanceof Error ? err.message : "Unknown error");
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    if (countryId) {
-      fetchProvinces();
-    }
-  }, [countryId]);
-
-  return { provinces, loading, error };
-};
-
-export const useCities = (provinceId: number) => {
+export const useAllCities = () => {
   const [cities, setCities] = useState<City[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const fetchCities = async () => {
+    const fetchAllCities = async () => {
       try {
-        const response = await fetch(`${API}/main/locations/cities`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ provinceID: provinceId }),
-        });
+        const countriesRes = await fetch(`${API}/main/locations/countries`);
+        if (!countriesRes.ok) throw new Error("Failed to fetch countries");
+        const countriesData = await countriesRes.json();
+        const countries = countriesData.data.countries;
 
-        if (!response.ok) {
-          throw new Error("Failed to fetch cities");
+        const allCities: City[] = [];
+        for (const country of countries) {
+          const provincesRes = await fetch(`${API}/main/locations/provinces`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ countryID: country.id }),
+          });
+
+          if (!provincesRes.ok) continue;
+          const provincesData = await provincesRes.json();
+
+          for (const province of provincesData.data) {
+            const citiesRes = await fetch(`${API}/main/locations/cities`, {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ provinceID: province.id }),
+            });
+
+            if (!citiesRes.ok) continue;
+            const citiesData = await citiesRes.json();
+
+            allCities.push(
+              ...citiesData.data.map((city: City) => ({
+                ...city,
+                country_id: country.id,
+              }))
+            );
+          }
         }
 
-        const data = await response.json();
-        setCities(data.data);
+        setCities(allCities);
       } catch (err) {
         setError(err instanceof Error ? err.message : "Unknown error");
       } finally {
@@ -117,55 +89,24 @@ export const useCities = (provinceId: number) => {
       }
     };
 
-    if (provinceId) {
-      fetchCities();
-    } else {
-      setCities([]);
-      setLoading(false);
-      setError(null);
-    }
-  }, [provinceId]);
+    fetchAllCities();
+  }, []);
 
   return { cities, loading, error };
 };
 
-export const useRegions = (cityId: number) => {
-  const [regions, setRegions] = useState<Region[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+export const useLocations = () => {
+  const { countries } = useCountries();
+  const { cities, loading, error } = useAllCities();
 
-  useEffect(() => {
-    const fetchRegions = async () => {
-      try {
-        const response = await fetch(`${API}/main/locations/regions`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ cityID: cityId }),
-        });
-
-        if (!response.ok) {
-          throw new Error("Failed to fetch regions");
-        }
-
-        const data = await response.json();
-        setRegions(data.data);
-      } catch (err) {
-        setError(err instanceof Error ? err.message : "Unknown error");
-      } finally {
-        setLoading(false);
-      }
+  const locations = cities.map((city) => {
+    const country = countries.find((c) => c.id === city.country_id);
+    return {
+      city: city.title,
+      country: country?.title || "Unknown",
+      fullName: `${city.title}, ${country?.title || ""}`,
     };
+  });
 
-    if (cityId) {
-      fetchRegions();
-    } else {
-      setRegions([]);
-      setLoading(false);
-      setError(null);
-    }
-  }, [cityId]);
-
-  return { regions, loading, error };
+  return { locations, loading, error };
 };
