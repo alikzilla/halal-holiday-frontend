@@ -1,11 +1,15 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import Image from "next/image";
 import { Heading6, Title1, Title2 } from "@/components/common";
 import { Button } from "@/components/ui";
 import { cn } from "@/core/lib/utils";
-import { useLocations } from "@/core/hooks/use-locations";
+import {
+  CityWithCountry,
+  Country,
+  useAllLocations,
+} from "@/core/hooks/use-locations";
 
 const HotelSearchBar = () => {
   const [isFromModalOpen, setIsFromModalOpen] = useState(false);
@@ -242,41 +246,77 @@ const Modal = ({
   onSelect: (value: string) => void;
 }) => {
   const [searchQuery, setSearchQuery] = useState("");
-  const { locations, loading, error } = useLocations();
+  const [, setSelectedDestination] = useState("");
+  const [isLoading, setIsLoading] = useState(true);
+  const [cachedCountries, setCachedCountries] = useState<Country[]>([]);
+  const [cachedCities, setCachedCities] = useState<CityWithCountry[]>([]);
 
-  // Filter locations based on search query
-  const filteredLocations = useMemo(() => {
-    if (!searchQuery) return locations;
+  const { countries, cities, loading } = useAllLocations();
 
-    const query = searchQuery.toLowerCase();
-    return locations.filter(
-      (location) =>
-        location.city.toLowerCase().includes(query) ||
-        location.country.toLowerCase().includes(query) ||
-        location.fullName.toLowerCase().includes(query)
-    );
-  }, [searchQuery, locations]);
+  console.log(countries, cities);
+
+  useEffect(() => {
+    if (!loading) {
+      setCachedCountries(countries);
+      setCachedCities(cities);
+      setIsLoading(false);
+    }
+  }, [countries, cities, loading]);
+
+  const filteredCountries = cachedCountries
+    .filter((country) =>
+      country.title.toLowerCase().includes(searchQuery.toLowerCase())
+    )
+    .slice(0, searchQuery ? 5 : cachedCountries.length);
+
+  const filteredCities = cachedCities.filter(
+    (city) =>
+      city.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      cachedCities
+        .filter(
+          (city) =>
+            city.countryName &&
+            city.countryName.toLowerCase().includes(searchQuery.toLowerCase())
+        )
+        .slice(0, searchQuery ? 5 : cachedCities.length)
+  );
+
+  const hasResults = filteredCountries.length > 0 || filteredCities.length > 0;
+
+  const handleSelectDestination = (destination: string) => {
+    setSelectedDestination(destination);
+    onSelect(destination);
+    onClose();
+  };
+
+  const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter") {
+      onClose();
+    }
+  };
 
   return (
-    <div className="absolute top-[80px] flex items-center justify-center z-50">
-      <div className="bg-white p-4 rounded-lg w-[388px] shadow-lg max-h-[80vh] overflow-hidden">
+    <div className="absolute top-[80px] flex items-center justify-center">
+      <div className="bg-white p-4 rounded-lg w-[388px] shadow-lg">
         {/* Search Input */}
         <input
           type="text"
-          placeholder="Search city or country"
+          placeholder="Search destination"
           className="w-full px-3 py-4 border border-[#F2F2F2] rounded-xl mb-4"
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          onKeyDown={(e) => e.key === "Enter" && onClose()}
+          onKeyDown={handleKeyPress}
         />
 
-        <Title1 className="text-black mb-6">All Cities</Title1>
+        {!searchQuery && (
+          <Title1 className="text-black mb-6">Suggested destinations</Title1>
+        )}
 
-        {/* Content */}
-        <div className="space-y-3 max-h-[60vh] overflow-y-auto">
-          {loading ? (
-            // Loading state
-            Array.from({ length: 10 }).map((_, index) => (
+        {/* Suggested Destinations */}
+        <div className="space-y-3 max-h-[300px] overflow-y-auto">
+          {isLoading ? (
+            // Show skeleton loading while fetching
+            Array.from({ length: 5 }).map((_, index) => (
               <div
                 key={index}
                 className="flex items-center justify-start gap-2 rounded-full"
@@ -288,36 +328,73 @@ const Modal = ({
                 </div>
               </div>
             ))
-          ) : error ? (
-            // Error state
-            <p className="text-red-500 text-center py-4">{error}</p>
-          ) : filteredLocations.length > 0 ? (
-            // Locations list
-            filteredLocations.map((location, index) => (
-              <div
-                key={`${location.city}-${index}`}
-                className="flex items-center justify-start gap-2 rounded-full hover:bg-gray-100 cursor-pointer p-2"
-                onClick={() => onSelect(location.fullName)}
-              >
-                <Image
-                  src="/assets/icons/location.svg"
-                  alt="location"
-                  width={44}
-                  height={44}
-                  className="bg-[#F9F9F9] rounded-full p-2"
-                />
-                <div>
-                  <p className="font-medium">{location.city}</p>
-                  <p className="text-sm text-gray-500">{location.country}</p>
+          ) : hasResults ? (
+            <>
+              {/* Show countries */}
+              {filteredCountries.length > 0 && (
+                <div className="mb-4">
+                  <h3 className="font-medium text-gray-500 mb-2">Countries</h3>
+                  {filteredCountries.map((country, index) => (
+                    <div
+                      key={`country-${index}`}
+                      className="flex items-center justify-start gap-2 rounded-full hover:bg-gray-100 cursor-pointer p-2"
+                      onClick={() => handleSelectDestination(country.title)}
+                    >
+                      <Image
+                        src={"/assets/icons/location.svg"}
+                        alt={"location"}
+                        width={44}
+                        height={44}
+                        className="bg-[#F9F9F9] rounded-full p-2"
+                      />
+                      <div>
+                        <p className="font-medium">{country.title}</p>
+                        {country.is_top && (
+                          <p className="text-sm text-gray-500">
+                            Good destination
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                  ))}
                 </div>
-              </div>
-            ))
+              )}
+
+              {/* Show cities with country */}
+              {filteredCities.length > 0 && (
+                <div>
+                  <h3 className="font-medium text-gray-500 mb-2">Cities</h3>
+                  {filteredCities.map((city, index) => (
+                    <div
+                      key={`city-${index}`}
+                      className="flex items-center justify-start gap-2 rounded-full hover:bg-gray-100 cursor-pointer p-2"
+                      onClick={() =>
+                        handleSelectDestination(
+                          `${city.title} - ${city.countryName}`
+                        )
+                      }
+                    >
+                      <Image
+                        src={"/assets/icons/location.svg"}
+                        alt={"location"}
+                        width={44}
+                        height={44}
+                        className="bg-[#F9F9F9] rounded-full p-2"
+                      />
+                      <div>
+                        <p className="font-medium">{city.title}</p>
+                        <p className="text-sm text-gray-500">
+                          {city.countryName}
+                        </p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </>
           ) : (
-            // No results
             <p className="text-gray-500 text-center py-4">
-              {locations.length === 0
-                ? "No cities available"
-                : "No matching cities found"}
+              No destinations found
             </p>
           )}
         </div>
