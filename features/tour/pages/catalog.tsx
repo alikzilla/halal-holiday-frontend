@@ -9,23 +9,20 @@ import {
   FilterHeader,
   TourSearchBar,
 } from "../components";
-import { hotels } from "@/core/lib/globals";
 
 const Tours = () => {
   return (
     <Layout isTransparent={false}>
       <Container className="pt-[80px] pb-[80px]">
-        <Suspense>
-          <TourSearchBar />
-          <Breadcrumb />
-          <div className="flex">
-            <FilterTour />
-            <div className="flex-1 ml-6">
-              <FilterHeader />
-              <CatalogTour tours={hotels} />
-            </div>
+        <TourSearchBar />
+        <Breadcrumb />
+        <div className="flex">
+          <FilterTour />
+          <div className="flex-1 ml-6">
+            <FilterHeader />
+            <CatalogTour />
           </div>
-        </Suspense>
+        </div>
       </Container>
     </Layout>
   );

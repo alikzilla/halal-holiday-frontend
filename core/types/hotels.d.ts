@@ -1,27 +1,18 @@
 export interface IHotel {
   id: number;
-  name: string;
-  location: string;
-  duration: string;
-  bedType: string;
-  price: number;
-  discountedPrice?: number;
-  taxesIncluded: boolean;
-  features?: string[];
-  roomsLeft?: number;
-  isMostBooked?: boolean;
-  address?: string;
-  rating?: number;
-  images?: string[];
-  description?: string;
-  rooms?: Room[];
-  reviews?: Review[];
-  surroundings?: string[];
-  facilities?: string[];
-  thingsToKnow?: string[];
-  faqs?: FAQ[];
-  guests?: string;
-  tag?: string;
+  title?: string;
+  source?: number;
+  photo?: string;
+  url?: string;
+  stars?: number;
+  score?: number;
+  body?: string;
+  is_top?: 0 | 1;
+  city_title?: string;
+  country_title?: string;
+  score_text?: string;
+  reviews?: number;
+  price?: number;
 }
 
 interface Room {

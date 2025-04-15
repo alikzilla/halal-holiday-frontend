@@ -1,26 +1,50 @@
+"use client";
+
 import React from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { Body2, Heading4, Heading5, Title2 } from "@/components/common";
 import { IHotel } from "@/core/types/hotels";
+import { useSearchParams } from "next/navigation";
 
-interface HotelCard extends IHotel {
-  guests?: string;
-}
-
-const HotelCardType1: React.FC<HotelCard> = ({
+const HotelCardType1: React.FC<IHotel> = ({
   id,
-  name,
-  location,
-  duration,
-  bedType,
+  title,
+  source,
+  photo,
+  url,
+  stars,
+  score,
+  body,
+  is_top,
+  city_title,
+  country_title,
+  score_text,
+  reviews,
   price,
-  taxesIncluded,
-  guests = "2 adults",
 }) => {
+  const searchParams = useSearchParams();
+
+  const buildHotelUrl = () => {
+    const params = new URLSearchParams();
+
+    if (searchParams.has("checkIn"))
+      params.set("checkIn", searchParams.get("checkIn")!);
+    if (searchParams.has("checkOut"))
+      params.set("checkOut", searchParams.get("checkOut")!);
+    if (searchParams.has("adults"))
+      params.set("adults", searchParams.get("adults")!);
+    if (searchParams.has("children"))
+      params.set("children", searchParams.get("children")!);
+    if (searchParams.has("chage"))
+      params.set("chage", searchParams.get("chage")!);
+
+    return `/hotel/${url}?${params.toString()}`;
+  };
+
   return (
     <Link
-      href={`/hotel/${id}`}
+      href={buildHotelUrl()}
       className="flex flex-col items-start gap-[8px] overflow-hidden border border-[1px] border-[#F2F2F2] p-2 rounded-xl shadow-sm transition-all duration-300 hover:shadow-lg"
     >
       <div className="relative">
@@ -35,10 +59,8 @@ const HotelCardType1: React.FC<HotelCard> = ({
           4.5
         </div>
         <Image
-          src={
-            "https://s3-alpha-sig.figma.com/img/0521/19a6/f83895396bca3c793d76d39a4341d326?Expires=1743984000&Key-Pair-Id=APKAQ4GOSFWCW27IBOMQ&Signature=FCET7ZSj6Q7vx0ZU7YU~ggOhWe-5a42~R3mSgdG0hyNeLGDS6UK4NzUVlYG4L-gXYNeBtRZMMtdYAHoSCAJuAFeO7zqbUGgT39gBLZFo2j1q3Pgh6Dg77hDWh0mW9se5IXKDCKnV5aVLpgBuBlMFjHZJJHHX8ocT1pErOKZa2RIF6B6enxoGOPxiTMywiedpX-Il0dT~Zd2s~ezuAcSFafAkFpzAbNoGb9KQwveWTkbUv1oHUKisLmufrkeaQzqbfI25PK7OsN4rgleYDg95vGPgRUi3po5PTXTnyZGT8JnB8~eyICAki0PgA~w5G3upPJGdXywJq~lko1ljkz4TAw__"
-          }
-          alt={name}
+          src={`https://halalholidaycheck.com/images/properties/${photo}`}
+          alt={title || "Hotel image"}
           width={100}
           height={100}
           className="w-full h-48 object-cover rounded-xl"
@@ -46,7 +68,7 @@ const HotelCardType1: React.FC<HotelCard> = ({
       </div>
 
       <div className="flex flex-col items-start gap-6 p-2">
-        <Heading5 className="text-[#222222]">{name}</Heading5>
+        <Heading5 className="text-[#222222]">{title}</Heading5>
         <Body2 className="inline-flex items-center gap-1 text-[#ADADAD]">
           <Image
             src={"/assets/icons/location-grey.svg"}
@@ -54,21 +76,19 @@ const HotelCardType1: React.FC<HotelCard> = ({
             width={14}
             height={14}
           />{" "}
-          {location}
+          {city_title}, {country_title}
         </Body2>
-        <Body2 className="text-black py-2 px-3 bg-[#F9F9F9] rounded-[30px]">
+        {/* <Body2 className="text-black py-2 px-3 bg-[#F9F9F9] rounded-[30px]">
           {bedType}
-        </Body2>
+        </Body2> */}
         <div className="flex flex-col items-start gap-1">
-          <Title2 className="text-[#919191]">
+          {/* <Title2 className="text-[#919191]">
             {duration}, {guests}
-          </Title2>
-          <Heading4 className="text-[#266462]">${price.toFixed(2)}</Heading4>
-          {taxesIncluded && (
-            <Title2 className="text-[#919191]">
-              Include taxes and chagers
-            </Title2>
-          )}
+          </Title2> */}
+          <Heading4 className="text-[#266462]">
+            ${price && price.toFixed(2)}
+          </Heading4>
+          <Title2 className="text-[#919191]">Include taxes and chagers</Title2>
         </div>
       </div>
     </Link>

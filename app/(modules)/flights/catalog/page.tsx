@@ -1,5 +1,10 @@
 import Flights from "@/features/hotel/pages/catalog";
+import { Suspense } from "react";
 
 export default function FlightsCatalogPage() {
-  return <Flights />;
+  return (
+    <Suspense>
+      <Flights />
+    </Suspense>
+  );
 }

@@ -153,7 +153,12 @@ export const useRegions = ({ cityId }: { cityId: number }) => {
 export const useAllLocations = () => {
   const [locations, setLocations] = useState<{
     countries: Country[];
-    cities: City[];
+    cities: (City & {
+      countryId: number;
+      countryName: string;
+      provinceId: number;
+      provinceName: string;
+    })[];
   }>({ countries: [], cities: [] });
 
   const [loading, setLoading] = useState(true);
@@ -163,64 +168,76 @@ export const useAllLocations = () => {
     const fetchAllLocations = async () => {
       try {
         setLoading(true);
+        setError(null);
 
         // 1. Fetch all countries
         const countriesResponse = await fetch(
           `${API}/main/locations/countries`
         );
-        if (!countriesResponse.ok) {
-          throw new Error("Failed to fetch countries");
-        }
+        if (!countriesResponse.ok) throw new Error("Failed to fetch countries");
         const countriesData = await countriesResponse.json();
-        const countries = countriesData.data.countries;
+        const countries = countriesData.data?.countries || [];
 
-        // 2. Fetch provinces for all countries
-        const provincesPromises = countries.map(async (country: Country) => {
-          const response = await fetch(`${API}/main/locations/provinces`, {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({ countryID: country.id }),
-          });
-          if (!response.ok) {
-            throw new Error(
-              `Failed to fetch provinces for country ${country.id}`
+        if (!countries.length) throw new Error("No countries found");
+
+        // 2. Fetch provinces for all countries (with country info)
+        const provincesData = await Promise.all(
+          countries.map(async (country: Country) => {
+            const response = await fetch(`${API}/main/locations/provinces`, {
+              method: "POST",
+              body: JSON.stringify({ countryID: country.id }),
+            });
+            if (!response.ok) {
+              console.warn(`Failed provinces for country ${country.id}`);
+              return [];
+            }
+            const data = await response.json();
+            return (
+              data.data?.provinces?.map((province: Province) => ({
+                ...province,
+                countryId: country.id,
+                countryName: country.title,
+              })) || []
             );
-          }
-          const data = await response.json();
-          return data.data.provinces;
-        });
+          })
+        );
+        const provinces = provincesData.flat();
 
-        const provincesResults = await Promise.all(provincesPromises);
-        const provinces = provincesResults.flat();
+        // 3. Fetch cities for all provinces (with full context)
+        const citiesData = await Promise.all(
+          provinces.map(
+            async (
+              province: Province & {
+                countryId: number;
+                countryName: string;
+              }
+            ) => {
+              const response = await fetch(`${API}/main/locations/cities`, {
+                method: "POST",
+                body: JSON.stringify({ provinceID: province.id }),
+              });
+              if (!response.ok) {
+                console.warn(`Failed cities for province ${province.id}`);
+                return [];
+              }
+              const data = await response.json();
+              return (
+                data.data?.cities?.map((city: City) => ({
+                  ...city,
+                  countryId: province.countryId,
+                  countryName: province.countryName,
+                  provinceId: province.id,
+                  provinceName: province.title,
+                })) || []
+              );
+            }
+          )
+        );
+        const cities = citiesData.flat();
 
-        // 3. Fetch cities for all provinces
-        const citiesPromises = provinces.map(async (province: Province) => {
-          const response = await fetch(`${API}/main/locations/cities`, {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({ provinceID: province.id }),
-          });
-          if (!response.ok) {
-            throw new Error(
-              `Failed to fetch cities for province ${province.id}`
-            );
-          }
-          const data = await response.json();
-          return data.data.cities;
-        });
-
-        const citiesResults = await Promise.all(citiesPromises);
-        const cities = citiesResults.flat();
-
-        setLocations({
-          countries,
-          cities,
-        });
+        setLocations({ countries, cities });
       } catch (err) {
+        console.error("Fetch locations error:", err);
         setError(err instanceof Error ? err.message : "Unknown error");
       } finally {
         setLoading(false);

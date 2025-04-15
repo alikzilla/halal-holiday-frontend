@@ -4,33 +4,25 @@ import Image from "next/image";
 import { Body2, Heading3, Heading5, Title2 } from "@/components/common";
 import { IHotel } from "@/core/types/hotels";
 
-interface HotelCardType2 extends IHotel {
-  rating?: number;
-  features?: string[];
-  originalPrice?: number;
-  roomsLeft?: number;
-  tag?: string;
-  guests?: string;
-}
-
-const HotelCardType2: React.FC<HotelCardType2> = ({
+const HotelCardType2: React.FC<IHotel> = ({
   id,
-  name,
-  location,
-  duration,
-  bedType,
+  title,
+  source,
+  photo,
+  url,
+  stars,
+  score,
+  body,
+  is_top,
+  city_title,
+  country_title,
+  score_text,
+  reviews,
   price,
-  originalPrice,
-  rating = 4.5,
-  features = [],
-  roomsLeft,
-  tag,
-  taxesIncluded,
-  guests = "2 adults",
 }) => {
   return (
     <Link
-      href={`/hotel/${id}`}
+      href={`/hotel/${url}`}
       className="w-full border border-[#F2F2F2] rounded-xl overflow-hidden shadow-sm flex cursor-pointer transition-all duration-300 hover:shadow-lg"
     >
       {/* Image with rating badge */}
@@ -43,13 +35,11 @@ const HotelCardType2: React.FC<HotelCardType2> = ({
             height={18}
             width={18}
           />{" "}
-          {rating}
+          {stars}
         </div>
         <Image
-          src={
-            "https://s3-alpha-sig.figma.com/img/0521/19a6/f83895396bca3c793d76d39a4341d326?Expires=1743984000&Key-Pair-Id=APKAQ4GOSFWCW27IBOMQ&Signature=FCET7ZSj6Q7vx0ZU7YU~ggOhWe-5a42~R3mSgdG0hyNeLGDS6UK4NzUVlYG4L-gXYNeBtRZMMtdYAHoSCAJuAFeO7zqbUGgT39gBLZFo2j1q3Pgh6Dg77hDWh0mW9se5IXKDCKnV5aVLpgBuBlMFjHZJJHHX8ocT1pErOKZa2RIF6B6enxoGOPxiTMywiedpX-Il0dT~Zd2s~ezuAcSFafAkFpzAbNoGb9KQwveWTkbUv1oHUKisLmufrkeaQzqbfI25PK7OsN4rgleYDg95vGPgRUi3po5PTXTnyZGT8JnB8~eyICAki0PgA~w5G3upPJGdXywJq~lko1ljkz4TAw__"
-          }
-          alt={name}
+          src={`https://halalholidaycheck.com/images/properties/${photo}`}
+          alt={title || "Hotel name"}
           width={100}
           height={100}
           className="w-[330px] h-[250px] object-cover rounded-xl"
@@ -61,7 +51,7 @@ const HotelCardType2: React.FC<HotelCardType2> = ({
         <div>
           {/* Hotel name and location */}
           <div className="mb-4 pt-2">
-            <Heading5 className="text-[#222] mb-2">{name}</Heading5>
+            <Heading5 className="text-[#222] mb-2">{title}</Heading5>
             <Body2 className="text-[#ADADAD] flex items-center gap-1">
               <Image
                 src="/assets/icons/location-grey.svg"
@@ -69,22 +59,20 @@ const HotelCardType2: React.FC<HotelCardType2> = ({
                 width={14}
                 height={14}
               />
-              {location}
+              {city_title}, {country_title}
             </Body2>
           </div>
 
-          {/* Duration and bed type */}
-          <div className="mb-4 flex items-center gap-1">
+          {/* <div className="mb-4 flex items-center gap-1">
             <Body2 className="text-black py-2 px-3 bg-[#F9F9F9] rounded-[30px]">
               {duration}
             </Body2>
             <Body2 className="text-black py-2 px-3 bg-[#F9F9F9] rounded-[30px]">
               {bedType}
             </Body2>
-          </div>
+          </div> */}
 
-          {/* Features list */}
-          <div>
+          {/* <div>
             <ul className="flex flex-col items-start gap-2">
               {features.map((feature, index) => (
                 <li key={index} className="flex items-center gap-2">
@@ -98,44 +86,32 @@ const HotelCardType2: React.FC<HotelCardType2> = ({
                 </li>
               ))}
             </ul>
-          </div>
+          </div> */}
         </div>
 
         <div className="flex flex-col h-full justify-between p-2">
           {/* Rooms left and tag */}
           <div className="flex justify-end items-center mb-4">
-            {roomsLeft && (
-              <Body2 className="text-[#FF4747] bg-[#FFE8E8] border border-[#FFA3A3] rounded-[6px] font-medium py-[6px] px-3">
-                Only {roomsLeft} room{roomsLeft > 1 ? "s" : ""} left
-              </Body2>
-            )}
-            {tag && (
+            {score_text && (
               <Body2 className="bg-[#F9F9F9] text-[#222] px-2 py-1 rounded-full">
-                {tag}
+                {score_text}
               </Body2>
             )}
           </div>
 
           {/* Price section */}
           <div className="text-right">
-            <Title2 className="text-[#919191] mb-1">
+            {/* <Title2 className="text-[#919191] mb-1">
               {duration}, {guests}
-            </Title2>
+            </Title2> */}
             <div className="w-full flex items-end justify-end gap-2 mb-1 text-right">
-              {originalPrice && (
-                <Heading5 className="text-[#ADADAD] line-through">
-                  ${originalPrice.toFixed(2)}
-                </Heading5>
-              )}
               <Heading3 className="text-[#266462] text-right font-semibold">
-                ${price.toFixed(2)}
+                ${price && price.toFixed(2)}
               </Heading3>
             </div>
-            {taxesIncluded && (
-              <Title2 className="text-[#919191]">
-                Include taxes and charges
-              </Title2>
-            )}
+            <Title2 className="text-[#919191]">
+              Include taxes and charges
+            </Title2>
           </div>
         </div>
       </div>

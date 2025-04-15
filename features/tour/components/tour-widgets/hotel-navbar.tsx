@@ -8,16 +8,19 @@ const HotelNavbar = () => {
   const underlineRef = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
-  const sections = [
-    "Overview",
-    "Rooms",
-    "Halal Friendly Features",
-    "Hotel Surroundings",
-    "Reviews",
-    "General Facilities",
-    "Map",
-    "Things to Know",
-  ];
+  const sections = React.useMemo(
+    () => [
+      "Overview",
+      "Tour Guide",
+      "Tour Detail",
+      "Location",
+      "Tour Surroundings",
+      "Reviews",
+      "Map",
+      "Things to Know",
+    ],
+    []
+  );
 
   // Calculate equal width for each tab
   const tabWidth = `${100 / sections.length}%`;

@@ -10,6 +10,8 @@ export { Progress } from "./progress/progress";
 export { default as Link } from "./link/link";
 export { default as HeroBadge } from "./hero-badge/hero-badge";
 export { default as Breadcrumb } from "./breadcrumb/breadcrumb";
+export { default as Loader } from "./loader/loader";
+export { default as Error } from "./error/error";
 
 // Search bar
 export { default as SearchBar } from "./search-bar/search-bar";

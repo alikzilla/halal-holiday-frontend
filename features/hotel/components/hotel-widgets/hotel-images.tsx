@@ -5,8 +5,9 @@ import ImageGallery from "react-image-gallery";
 import "react-image-gallery/styles/css/image-gallery.css";
 import Image from "next/image";
 import { Button } from "@/components/ui";
+import { Photo } from "../../core/types/hotel";
 
-const HotelImages = ({ images }: { images: string[] }) => {
+const HotelImages = ({ images }: { images: Photo[] }) => {
   // eslint-disable-next-line react-hooks/rules-of-hooks
   const [isGalleryOpen, setIsGalleryOpen] = useState(false);
   // eslint-disable-next-line react-hooks/rules-of-hooks
@@ -15,8 +16,12 @@ const HotelImages = ({ images }: { images: string[] }) => {
   const galleryRef = useRef<HTMLDivElement>(null);
 
   const galleryImages = images.map((img) => ({
-    original: img,
-    thumbnail: img,
+    original:
+      `https://halalholidaycheck.com/images/properties/${img.pic}` ||
+      "/placeholder-hotel.jpg",
+    thumbnail:
+      `https://halalholidaycheck.com/images/properties/${img.pic}` ||
+      "/placeholder-hotel.jpg",
   }));
 
   const handleImageClick = (index: number) => {
@@ -26,7 +31,7 @@ const HotelImages = ({ images }: { images: string[] }) => {
 
   const displayImages = [...images];
   while (displayImages.length < 5) {
-    displayImages.push("");
+    displayImages.push();
   }
 
   useEffect(() => {
@@ -53,8 +58,13 @@ const HotelImages = ({ images }: { images: string[] }) => {
       <div className="relative w-full flex items-start gap-2">
         {/* Main large image - takes full width on mobile, 2 cols on desktop */}
         <div className="w-1/2">
+          {/* https://halalholidaycheck.com/images/properties/selge-beach-resort-spa-hotel-alanya_83.jpg */}
+
           <Image
-            src={displayImages[0] || "/placeholder-hotel.jpg"}
+            src={
+              `https://halalholidaycheck.com/images/properties/${displayImages[0].pic}` ||
+              "/placeholder-hotel.jpg"
+            }
             alt="Main hotel image"
             width={600}
             height={500}
@@ -68,7 +78,10 @@ const HotelImages = ({ images }: { images: string[] }) => {
           {[1, 2, 3, 4].map((index) => (
             <Image
               key={index}
-              src={displayImages[index] || "/placeholder-hotel.jpg"}
+              src={
+                `https://halalholidaycheck.com/images/properties/${displayImages[index].pic}` ||
+                "/placeholder-hotel.jpg"
+              }
               alt={`Hotel image ${index}`}
               width={400}
               height={250}

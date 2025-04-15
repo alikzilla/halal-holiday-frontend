@@ -1,12 +1,11 @@
 import React from "react";
 import { TourCard } from "..";
-import { IHotel } from "@/core/types/hotels";
 
-const CatalogHotel = ({ tours }: { tours: IHotel[] }) => {
+const CatalogHotel = () => {
   return (
     <section>
       <div className="w-full flex flex-col items-start gap-5">
-        {tours.map((hotel, index) => (
+        {/* {tours.map((hotel, index) => (
           <TourCard
             key={index}
             id={hotel.id}
@@ -21,7 +20,7 @@ const CatalogHotel = ({ tours }: { tours: IHotel[] }) => {
             roomsLeft={hotel.roomsLeft || 0}
             isMostBooked={hotel.isMostBooked || false}
           />
-        ))}
+        ))} */}
       </div>
     </section>
   );

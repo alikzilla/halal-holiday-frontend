@@ -5,8 +5,10 @@ import { Heading5 } from "@/components/common";
 import { Button } from "@/components/ui";
 
 const CatalogHeader = ({
+  count,
   onLayoutChange,
 }: {
+  count: number;
   onLayoutChange: (layout: "grid" | "flex") => void;
 }) => {
   const [layout, setLayout] = useState<"grid" | "flex">("grid");
@@ -19,7 +21,7 @@ const CatalogHeader = ({
   return (
     <div className="flex justify-between items-center mb-4">
       <span className="inline-flex gap-1">
-        <Heading5 className="text-[#222]">1,397</Heading5> properties found
+        <Heading5 className="text-[#222]">{count}</Heading5> properties found
       </span>
       <div className="flex space-x-2">
         <Button

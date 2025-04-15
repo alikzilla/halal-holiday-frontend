@@ -1,8 +1,8 @@
 "use client";
 
-import { Suspense, useState } from "react";
+import { useState } from "react";
 import { Container, MainLayout as Layout } from "@/components/common";
-import { Breadcrumb } from "@/components/ui";
+import { Breadcrumb, Loader, Error } from "@/components/ui";
 import {
   CatalogHeader,
   FilterHotel,
@@ -10,29 +10,34 @@ import {
   FilterHeader,
   HotelSearchBar,
 } from "../components";
-import { hotels } from "@/core/lib/globals";
+import { useHotelsSearch } from "../core/hooks/use-hotels";
 
-const Flights = () => {
+const Hotels = () => {
   const [layout, setLayout] = useState<"grid" | "flex">("grid");
+  const { hotels, loading, error } = useHotelsSearch();
 
   return (
     <Layout isTransparent={false}>
       <Container className="pt-[80px] pb-[80px]">
-        <Suspense>
-          <HotelSearchBar />
-          <Breadcrumb />
-          <div className="flex">
-            <FilterHotel />
-            <div className="flex-1 ml-6">
-              <FilterHeader />
-              <CatalogHeader onLayoutChange={setLayout} />
+        <HotelSearchBar />
+        <Breadcrumb />
+        <div className="flex">
+          <FilterHotel />
+          <div className="flex-1 ml-6">
+            <FilterHeader />
+            <CatalogHeader count={hotels.length} onLayoutChange={setLayout} />
+            {loading ? (
+              <Loader />
+            ) : error ? (
+              <Error error={error} />
+            ) : (
               <CatalogHotel hotels={hotels} layout={layout} />
-            </div>
+            )}
           </div>
-        </Suspense>
+        </div>
       </Container>
     </Layout>
   );
 };
 
-export default Flights;
+export default Hotels;

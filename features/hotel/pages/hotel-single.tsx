@@ -2,8 +2,7 @@
 
 import React from "react";
 import { MainLayout as Layout, Container } from "@/components/common";
-import { Breadcrumb } from "@/components/ui";
-import { IHotel } from "@/core/types/hotels";
+import { Breadcrumb, Error, Loader } from "@/components/ui";
 import {
   HotelDesc,
   HotelFacilities,
@@ -17,27 +16,42 @@ import {
   HotelSurroundings,
   HotelThingsToKnow,
 } from "@/features/hotel/components";
+import { useHotelSearch } from "../core/hooks/use-hotels";
 
-const HotelSingle = ({ hotel }: { hotel: IHotel }) => {
+const HotelSingle = ({ slug }: { slug: string }) => {
+  const { hotel, loading, error } = useHotelSearch(slug as string);
+
   return (
     <Layout isTransparent={false}>
       <Container className="pt-[90px] pb-[80px]">
-        <Breadcrumb />
-        <HotelHeader
-          name={hotel.name}
-          address={hotel.location}
-          rating={hotel.rating !== undefined ? hotel.rating.toString() : "N/A"}
-        />
-        <HotelImages images={hotel.images || []} />
-        <HotelNavbar />
-        <HotelDesc description={hotel.description || ""} />
-        <HalalFriendlyFeatures />
-        <HotelRooms />
-        <HotelMap />
-        <HotelReviews />
-        <HotelSurroundings />
-        <HotelFacilities />
-        <HotelThingsToKnow />
+        {loading ? (
+          <Loader />
+        ) : !hotel ? (
+          <Error error={error || "Error"} />
+        ) : (
+          <>
+            <Breadcrumb />
+            <HotelHeader
+              title={hotel.property.title || "Name"}
+              address={hotel.property.title}
+              rating={
+                hotel.property.title !== undefined
+                  ? hotel.property.title.toString()
+                  : "N/A"
+              }
+            />
+            <HotelImages images={hotel.property.photos || []} />
+            <HotelNavbar />
+            <HotelDesc description={hotel.property.body || ""} />
+            <HalalFriendlyFeatures />
+            <HotelRooms />
+            <HotelMap />
+            <HotelReviews />
+            <HotelSurroundings />
+            <HotelFacilities />
+            <HotelThingsToKnow />
+          </>
+        )}
       </Container>
     </Layout>
   );

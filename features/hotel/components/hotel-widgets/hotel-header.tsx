@@ -4,11 +4,11 @@ import { Heading4, Title1 } from "@/components/common";
 import Image from "next/image";
 
 const HotelHeader = ({
-  name,
+  title,
   address,
   rating,
 }: {
-  name: string;
+  title: string;
   address: string;
   rating: string;
 }) => {
@@ -20,7 +20,7 @@ const HotelHeader = ({
   return (
     <div className="w-full flex items-center justify-between">
       <div className="flex flex-col items-center justify-start gap-2">
-        <Heading4 className="text-[#222]">{name}</Heading4>
+        <Heading4 className="text-[#222]">{title}</Heading4>
         <span className="w-full flex items-center justify-start gap-[0.5px]">
           <Image
             src={"/assets/icons/location-grey.svg"}
@@ -37,7 +37,7 @@ const HotelHeader = ({
       <div className="flex items-center justify-end gap-2">
         <div className="flex flex-col items-end justify-end mr-2">
           <div className="flex items-center gap-[5.5px]">
-            {[...Array(fullStars)].map((_, i) => (
+            {[...Array(rating)].map((_, i) => (
               <Image
                 key={`full-${i}`}
                 src={"/assets/icons/star-yellow.svg"}
@@ -56,7 +56,7 @@ const HotelHeader = ({
               />
             )}
 
-            {[...Array(emptyStars)].map((_, i) => (
+            {/* {[...Array(rating - 5)].map((_, i) => (
               <Image
                 key={`empty-${i}`}
                 src={"/assets/icons/star-gray.svg"}
@@ -64,7 +64,7 @@ const HotelHeader = ({
                 width={16}
                 height={16}
               />
-            ))}
+            ))} */}
           </div>
           <Title1 className="text-[#222] underline">34 reviews</Title1>
         </div>

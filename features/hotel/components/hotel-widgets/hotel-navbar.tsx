@@ -11,11 +11,11 @@ const HotelNavbar = () => {
   const sections = React.useMemo(
     () => [
       "Overview",
-      "Tour Guide",
-      "Tour Detail",
-      "Location",
-      "Tour Surroundings",
+      "Rooms",
+      "Halal Friendly Features",
+      "Hotel Surroundings",
       "Reviews",
+      "General Facilities",
       "Map",
       "Things to Know",
     ],
@@ -92,7 +92,7 @@ const HotelNavbar = () => {
               <button
                 key={sectionId}
                 onClick={() => handleScroll(sectionId)}
-                className={`flex-1 text-center px-4 py-4 whitespace-nowrap transition-colors duration-200 ${
+                className={`flex-1 text-sm text-center px-3 py-4 whitespace-nowrap transition-colors duration-200 ${
                   activeSection === sectionId
                     ? "text-[#222] font-medium"
                     : "text-gray-500 hover:text-[#222]"

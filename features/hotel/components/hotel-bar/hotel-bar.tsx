@@ -10,14 +10,14 @@ import {
   Country,
   useAllLocations,
 } from "@/core/hooks/use-locations";
+import { useRouter } from "next/navigation";
 
 const HotelSearchBar = () => {
-  const [isFromModalOpen, setIsFromModalOpen] = useState(false);
+  const [, setIsFromModalOpen] = useState(false);
   const [isToModalOpen, setIsToModalOpen] = useState(false);
   const [isDateModalOpen, setIsDateModalOpen] = useState(false);
   const [isGuestsModalOpen, setIsGuestsModalOpen] = useState(false);
 
-  const [fromDestination, setFromDestination] = useState("");
   const [toDestination, setToDestination] = useState("");
   const [checkInDate, setCheckInDate] = useState("");
   const [checkOutDate, setCheckOutDate] = useState("");
@@ -28,17 +28,20 @@ const HotelSearchBar = () => {
     pets: number;
   }>({ adults: 0, children: 0, infants: 0, pets: 0 });
 
-  // const openFromModal = () => setIsFromModalOpen(true);
-  const openToModal = () => setIsToModalOpen(true);
+  const router = useRouter();
+  const [cachedCountries, setCachedCountries] = useState<Country[]>([]);
+  const [cachedCities, setCachedCities] = useState<CityWithCountry[]>([]);
+  const { countries, cities, loading } = useAllLocations();
+
+  useEffect(() => {
+    if (!loading) {
+      setCachedCountries(countries);
+      setCachedCities(cities);
+    }
+  }, [loading, countries, cities]);
+
   const openDateModal = () => setIsDateModalOpen(true);
   const openGuestsModal = () => setIsGuestsModalOpen(true);
-
-  const toggleFromModal = () => {
-    setIsFromModalOpen(!isFromModalOpen);
-    closeToModal();
-    closeDateModal();
-    closeGuestsModal();
-  };
 
   const toggleToModal = () => {
     setIsToModalOpen(!isToModalOpen);
@@ -66,12 +69,6 @@ const HotelSearchBar = () => {
   const closeDateModal = () => setIsDateModalOpen(false);
   const closeGuestsModal = () => setIsGuestsModalOpen(false);
 
-  const handleFromDestinationSelect = (destination: string) => {
-    setFromDestination(destination);
-    closeFromModal();
-    openToModal();
-  };
-
   const handleToDestinationSelect = (destination: string) => {
     setToDestination(destination);
     closeToModal();
@@ -95,39 +92,34 @@ const HotelSearchBar = () => {
     console.log("Selected Guests:", guests);
   };
 
+  const handleSearchSubmit = () => {
+    // Find the selected city from the cachedCities
+    const selectedCity = cachedCities.find(
+      (city) => `${city.title}, ${city.countryName}` === toDestination
+    );
+
+    if (!selectedCity) {
+      console.error("No city selected");
+      return;
+    }
+
+    // Prepare query parameters
+    const queryParams = new URLSearchParams();
+    queryParams.append("cityId", selectedCity.id.toString());
+    if (checkInDate) queryParams.append("checkIn", checkInDate);
+    if (checkOutDate) queryParams.append("checkOut", checkOutDate);
+    queryParams.append("adults", guests.adults.toString());
+    queryParams.append("children", guests.children.toString());
+    queryParams.append("infants", guests.infants.toString());
+    queryParams.append("pets", guests.pets.toString());
+
+    // Navigate to the hotel catalog page
+    router.push(`/hotel/catalog?${queryParams.toString()}`);
+  };
+
   return (
     <div className="w-full py-4">
       <div className="flex w-full items-center justify-between gap-4">
-        {/* From Destination Button */}
-        <div className="relative flex-1 z-43">
-          <div
-            className="flex items-center gap-2 rounded-full cursor-pointer transition-all duration-300 hover:bg-gray-100"
-            onClick={toggleFromModal}
-          >
-            <Image
-              src={"/assets/icons/location.svg"}
-              alt={"location"}
-              width={44}
-              height={44}
-              className="bg-[#F9F9F9] rounded-full p-2"
-            />
-            <div className="flex flex-col">
-              <Heading6 className="text-[#ADADAD]">From</Heading6>
-              <Heading6 className="text-[#4C4C4C]">
-                {fromDestination || "Select destination"}
-              </Heading6>
-            </div>
-          </div>
-
-          {isFromModalOpen && (
-            <Modal
-              title="Select From Destination"
-              onClose={closeFromModal}
-              onSelect={handleFromDestinationSelect}
-            />
-          )}
-        </div>
-
         {/* To Destination Button */}
         <div className="relative flex-1 z-43">
           <div
@@ -154,6 +146,9 @@ const HotelSearchBar = () => {
               title="Select To Destination"
               onClose={closeToModal}
               onSelect={handleToDestinationSelect}
+              cachedCountries={cachedCountries}
+              cachedCities={cachedCities}
+              loading={loading}
             />
           )}
         </div>
@@ -231,6 +226,7 @@ const HotelSearchBar = () => {
           leadingIcon
           leading="magnifer"
           className="h-[56px] w-[56px] p-[12px]"
+          onClick={handleSearchSubmit}
         />
       </div>
     </div>
@@ -238,48 +234,42 @@ const HotelSearchBar = () => {
 };
 
 const Modal = ({
+  cachedCountries,
+  cachedCities,
+  loading,
   onClose,
   onSelect,
 }: {
   title: string;
+  cachedCountries: Country[];
+  cachedCities: CityWithCountry[];
+  countries?: Country[];
+  cities?: CityWithCountry[];
+  loading?: boolean;
   onClose: () => void;
   onSelect: (value: string) => void;
 }) => {
   const [searchQuery, setSearchQuery] = useState("");
   const [, setSelectedDestination] = useState("");
-  const [isLoading, setIsLoading] = useState(true);
-  const [cachedCountries, setCachedCountries] = useState<Country[]>([]);
-  const [cachedCities, setCachedCities] = useState<CityWithCountry[]>([]);
 
-  const { countries, cities, loading } = useAllLocations();
-
-  console.log(countries, cities);
-
-  useEffect(() => {
-    if (!loading) {
-      setCachedCountries(countries);
-      setCachedCities(cities);
-      setIsLoading(false);
-    }
-  }, [countries, cities, loading]);
-
+  // Corrected filtering logic
   const filteredCountries = cachedCountries
     .filter((country) =>
       country.title.toLowerCase().includes(searchQuery.toLowerCase())
     )
     .slice(0, searchQuery ? 5 : cachedCountries.length);
 
-  const filteredCities = cachedCities.filter(
-    (city) =>
-      city.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      cachedCities
-        .filter(
-          (city) =>
-            city.countryName &&
-            city.countryName.toLowerCase().includes(searchQuery.toLowerCase())
-        )
-        .slice(0, searchQuery ? 5 : cachedCities.length)
-  );
+  const filteredCities = cachedCities
+    .filter((city) => {
+      const matchesCity = city.title
+        .toLowerCase()
+        .includes(searchQuery.toLowerCase());
+      const matchesCountry = city.countryName
+        ?.toLowerCase()
+        .includes(searchQuery.toLowerCase());
+      return matchesCity || matchesCountry;
+    })
+    .slice(0, searchQuery ? 5 : cachedCities.length);
 
   const hasResults = filteredCountries.length > 0 || filteredCities.length > 0;
 
@@ -312,9 +302,9 @@ const Modal = ({
           <Title1 className="text-black mb-6">Suggested destinations</Title1>
         )}
 
-        {/* Suggested Destinations */}
+        {/* Results */}
         <div className="space-y-3 max-h-[300px] overflow-y-auto">
-          {isLoading ? (
+          {loading ? (
             // Show skeleton loading while fetching
             Array.from({ length: 5 }).map((_, index) => (
               <div
@@ -334,9 +324,9 @@ const Modal = ({
               {filteredCountries.length > 0 && (
                 <div className="mb-4">
                   <h3 className="font-medium text-gray-500 mb-2">Countries</h3>
-                  {filteredCountries.map((country, index) => (
+                  {filteredCountries.map((country) => (
                     <div
-                      key={`country-${index}`}
+                      key={`country-${country.id}`}
                       className="flex items-center justify-start gap-2 rounded-full hover:bg-gray-100 cursor-pointer p-2"
                       onClick={() => handleSelectDestination(country.title)}
                     >
@@ -349,7 +339,7 @@ const Modal = ({
                       />
                       <div>
                         <p className="font-medium">{country.title}</p>
-                        {country.is_top && (
+                        {country.is_top === 1 && (
                           <p className="text-sm text-gray-500">
                             Good destination
                           </p>
@@ -364,13 +354,13 @@ const Modal = ({
               {filteredCities.length > 0 && (
                 <div>
                   <h3 className="font-medium text-gray-500 mb-2">Cities</h3>
-                  {filteredCities.map((city, index) => (
+                  {filteredCities.map((city) => (
                     <div
-                      key={`city-${index}`}
+                      key={`city-${city.id}`}
                       className="flex items-center justify-start gap-2 rounded-full hover:bg-gray-100 cursor-pointer p-2"
                       onClick={() =>
                         handleSelectDestination(
-                          `${city.title} - ${city.countryName}`
+                          `${city.title}, ${city.countryName}`
                         )
                       }
                     >

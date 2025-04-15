@@ -17,12 +17,19 @@ const CatalogHotel = ({
             <HotelCard1
               key={index}
               id={hotel.id}
-              name={hotel.name}
-              location={hotel.location}
-              duration={hotel.duration}
-              bedType={hotel.bedType}
+              title={hotel.title}
+              source={hotel.source}
+              photo={hotel.photo}
+              url={hotel.url}
+              stars={hotel.stars}
+              score={hotel.score}
+              body={hotel.body}
+              is_top={hotel.is_top}
+              city_title={hotel.city_title}
+              country_title={hotel.country_title}
+              score_text={hotel.score_text}
+              reviews={hotel.reviews}
               price={hotel.price}
-              taxesIncluded={hotel.taxesIncluded}
             />
           ))}
         </div>
@@ -32,16 +39,19 @@ const CatalogHotel = ({
             <HotelCard2
               key={index}
               id={hotel.id}
-              name={hotel.name}
-              location={hotel.location}
-              duration={hotel.duration}
-              bedType={hotel.bedType}
+              title={hotel.title}
+              source={hotel.source}
+              photo={hotel.photo}
+              url={hotel.url}
+              stars={hotel.stars}
+              score={hotel.score}
+              body={hotel.body}
+              is_top={hotel.is_top}
+              city_title={hotel.city_title}
+              country_title={hotel.country_title}
+              score_text={hotel.score_text}
+              reviews={hotel.reviews}
               price={hotel.price}
-              taxesIncluded={hotel.taxesIncluded}
-              discountedPrice={hotel.discountedPrice || 0}
-              features={hotel.features || []}
-              roomsLeft={hotel.roomsLeft || 0}
-              isMostBooked={hotel.isMostBooked || false}
             />
           ))}
         </div>

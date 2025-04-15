@@ -14,12 +14,12 @@ import {
   TourThingsToKnow,
 } from "@/features/tour/components";
 
-const TourSingle = ({ tour }: { tour: IHotel }) => {
+const TourSingle = () => {
   return (
     <Layout isTransparent={false}>
       <Container className="pt-[90px] pb-[80px]">
         <Breadcrumb />
-        <TourHeader
+        {/* <TourHeader
           name={tour.name}
           address={tour.location}
           rating={tour.rating !== undefined ? tour.rating.toString() : "N/A"}
@@ -30,7 +30,7 @@ const TourSingle = ({ tour }: { tour: IHotel }) => {
 
         <TourReviews />
         <TourMap />
-        <TourThingsToKnow />
+        <TourThingsToKnow /> */}
       </Container>
     </Layout>
   );
