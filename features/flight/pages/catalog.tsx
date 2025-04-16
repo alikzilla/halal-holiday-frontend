@@ -1,3 +1,5 @@
+"use client";
+
 import { Container, MainLayout as Layout } from "@/components/common";
 import { Breadcrumb } from "@/components/ui";
 import {
@@ -5,6 +7,7 @@ import {
   FilterHeader,
   HotelSearchBar,
 } from "@/features/hotel/components";
+import { useEffect, useState } from "react";
 
 const Flights = () => {
   return (

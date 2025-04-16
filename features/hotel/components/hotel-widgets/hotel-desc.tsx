@@ -3,8 +3,6 @@ import Image from "next/image";
 import { Heading5, Body2 } from "@/components/common";
 
 const HotelDescription = ({ description }: { description: string }) => {
-  console.log(description);
-
   const facilities = [
     {
       name: "Non-smoking rooms",
@@ -58,27 +56,7 @@ const HotelDescription = ({ description }: { description: string }) => {
             <div className="w-full h-[1px] bg-[#F2F2F2] mt-2"></div>
           </div>
           <div className="w-full">
-            <Body2 className="text-[#222222] font-medium">
-              Overlooking London&apos;s Green Park is the world-famous The Ritz
-              London. This stunning Neoclassical building offers the height of
-              opulence with luxurious bedrooms, exquisite British cuisine, and
-              classic afternoon teas. Bedrooms at The Ritz London combine
-              stunning period architecture and antique furnishings with modern
-              amenities. Decorated in warm colours, they feature high ceilings,
-              ornate fireplaces and chandeliers.
-              <br />
-              <br />
-              Rooms are air-conditioned and elegant bathrooms with designer
-              toiletries. There is complimentary WiFi throughout the hotel. The
-              Michelin star Ritz Restaurant looks out over the gardens. It uses
-              the finest of ingredients in cuisine that is classically British
-              with a modern twist. The Rivoli Bar has an Art Deco style with
-              gold leaf decoration.
-              <br />
-              <br />
-              Couples particularly like the location — they rated it 9.9 for a
-              two-person trip.
-            </Body2>
+            <Body2 className="text-[#222222] font-medium">{description}</Body2>
           </div>
         </div>
       </section>

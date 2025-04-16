@@ -99,72 +99,85 @@ const AdventuresSection = () => {
 
   return (
     <section
-      className="w-full bg-cover bg-center bg-[#266462] py-[30px]"
+      className="w-full bg-cover bg-center bg-[#266462] py-8 md:py-[30px]"
       style={{ backgroundImage: `url('/assets/backgrounds/adventures.svg')` }}
     >
       <Container>
-        <section className="w-full flex flex-col items-center gap-6">
+        <section className="w-full flex flex-col items-center gap-4 md:gap-6">
+          {/* Header */}
           <div className="w-full text-center">
-            <Heading2>Unforgettable Adventures Await</Heading2>
-            <Body2 className="text-[#AEC6C5]">
+            <Heading2 className="text-2xl md:text-3xl lg:text-4xl text-white">
+              Unforgettable Adventures Await
+            </Heading2>
+            <Body2 className="text-[#AEC6C5] text-sm md:text-base">
               Discover thrilling experiences and unique activities tailored to
               create lasting memories.
             </Body2>
           </div>
 
-          <div className="w-full flex justify-center gap-2">
+          {/* Tab Navigation */}
+          <div className="w-full flex flex-wrap justify-center gap-2 md:gap-3 px-2">
             {tabs.map((tab) => (
               <Button
                 key={tab}
                 type={activeTab === tab ? "white" : "secondary"}
                 onClick={() => setActiveTab(tab)}
+                className="text-xs md:text-sm px-3 py-1 md:px-4 md:py-2"
               >
                 {tab}
               </Button>
             ))}
           </div>
 
-          <div className="w-full grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {/* Adventures Grid */}
+          <div className="w-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
             {filteredAdventures.map((adventure) => (
               <div
                 key={adventure.id}
-                className="flex flex-col items-center gap-4 relative"
+                className="flex flex-col items-center gap-3 md:gap-4 relative"
               >
                 {/* Sale Badge */}
                 {adventure.onSale && (
-                  <div className="absolute top-5 right-5 bg-[#FFE8E8] text-[#FF4747] font-bold px-3 py-2 rounded-lg text-sm z-10">
+                  <div className="absolute top-3 md:top-5 right-3 md:right-5 bg-[#FFE8E8] text-[#FF4747] font-bold px-2 py-1 md:px-3 md:py-2 rounded-lg text-xs md:text-sm z-10">
                     -10%
                   </div>
                 )}
 
-                {/* Image with Tint and Blur */}
-                <div className="w-full h-[285px] relative rounded-xl overflow-hidden">
+                {/* Image Container */}
+                <div className="w-full h-[200px] md:h-[285px] relative rounded-xl overflow-hidden">
                   <div
                     className="absolute inset-0 bg-cover bg-center"
                     style={{ backgroundImage: `url(${adventure.image})` }}
                   ></div>
                   <div className="absolute z-[1] bottom-0 left-0 w-full h-1/3 backdrop-blur-lg mask-gradient rounded-lg"></div>
-                  {/* Tint Overlay */}
                   <div className="absolute inset-0 bg-black/30"></div>
-                  {/* Content */}
-                  <div className="absolute z-1 bottom-0 left-0 right-0 p-4">
-                    <Heading6 className="text-white">
+                  <div className="absolute z-1 bottom-0 left-0 right-0 p-3 md:p-4">
+                    <Heading6 className="text-white text-sm md:text-base">
                       {adventure.duration}
                     </Heading6>
-                    <Heading2 className="text-white">
+                    <Heading2 className="text-white text-xl md:text-2xl">
                       {adventure.price}
                     </Heading2>
                   </div>
                 </div>
 
-                {/* Title and Description */}
-                <Heading4 className="text-[#fff] ">{adventure.title}</Heading4>
-                <Body2>{adventure.description}</Body2>
+                {/* Content */}
+                <div className="w-full px-2 md:px-0">
+                  <Heading4 className="text-white text-lg md:text-xl">
+                    {adventure.title}
+                  </Heading4>
+                  <Body2 className="text-[#AEC6C5] text-sm md:text-base">
+                    {adventure.description}
+                  </Body2>
+                </div>
               </div>
             ))}
           </div>
 
-          <Button type="white">See more</Button>
+          {/* See More Button */}
+          <Button type="white" className="mt-2 md:mt-4 px-6 py-2 md:py-3">
+            See more
+          </Button>
         </section>
       </Container>
     </section>

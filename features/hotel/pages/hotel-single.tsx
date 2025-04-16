@@ -21,6 +21,8 @@ import { useHotelSearch } from "../core/hooks/use-hotels";
 const HotelSingle = ({ slug }: { slug: string }) => {
   const { hotel, loading, error } = useHotelSearch(slug as string);
 
+  console.log(hotel?.property);
+
   return (
     <Layout isTransparent={false}>
       <Container className="pt-[90px] pb-[80px]">

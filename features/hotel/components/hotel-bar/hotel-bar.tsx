@@ -13,25 +13,36 @@ import {
 import { useRouter } from "next/navigation";
 
 const HotelSearchBar = () => {
-  const [, setIsFromModalOpen] = useState(false);
   const [isToModalOpen, setIsToModalOpen] = useState(false);
   const [isDateModalOpen, setIsDateModalOpen] = useState(false);
   const [isGuestsModalOpen, setIsGuestsModalOpen] = useState(false);
+  const [windowWidth, setWindowWidth] = useState(0);
 
   const [toDestination, setToDestination] = useState("");
   const [checkInDate, setCheckInDate] = useState("");
   const [checkOutDate, setCheckOutDate] = useState("");
-  const [guests, setGuests] = useState<{
-    adults: number;
-    children: number;
-    infants: number;
-    pets: number;
-  }>({ adults: 0, children: 0, infants: 0, pets: 0 });
+  const [guests, setGuests] = useState({
+    adults: 0,
+    children: 0,
+    infants: 0,
+    pets: 0,
+  });
 
   const router = useRouter();
   const [cachedCountries, setCachedCountries] = useState<Country[]>([]);
   const [cachedCities, setCachedCities] = useState<CityWithCountry[]>([]);
   const { countries, cities, loading } = useAllLocations();
+
+  useEffect(() => {
+    const handleResize = () => {
+      setWindowWidth(window.innerWidth);
+    };
+
+    setWindowWidth(window.innerWidth);
+    window.addEventListener("resize", handleResize);
+
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
   useEffect(() => {
     if (!loading) {
@@ -40,31 +51,26 @@ const HotelSearchBar = () => {
     }
   }, [loading, countries, cities]);
 
-  const openDateModal = () => setIsDateModalOpen(true);
-  const openGuestsModal = () => setIsGuestsModalOpen(true);
+  const isMobile = windowWidth <= 768;
 
   const toggleToModal = () => {
     setIsToModalOpen(!isToModalOpen);
-    closeFromModal();
-    closeDateModal();
-    closeGuestsModal();
+    setIsDateModalOpen(false);
+    setIsGuestsModalOpen(false);
   };
 
   const toggleDateModal = () => {
     setIsDateModalOpen(!isDateModalOpen);
-    closeFromModal();
-    closeToModal();
-    closeGuestsModal();
+    setIsToModalOpen(false);
+    setIsGuestsModalOpen(false);
   };
 
   const toggleGuestsModal = () => {
     setIsGuestsModalOpen(!isGuestsModalOpen);
-    closeFromModal();
-    closeToModal();
-    closeDateModal();
+    setIsToModalOpen(false);
+    setIsDateModalOpen(false);
   };
 
-  const closeFromModal = () => setIsFromModalOpen(false);
   const closeToModal = () => setIsToModalOpen(false);
   const closeDateModal = () => setIsDateModalOpen(false);
   const closeGuestsModal = () => setIsGuestsModalOpen(false);
@@ -72,14 +78,14 @@ const HotelSearchBar = () => {
   const handleToDestinationSelect = (destination: string) => {
     setToDestination(destination);
     closeToModal();
-    openDateModal();
+    if (!isMobile) toggleDateModal();
   };
 
   const handleDateSelect = (checkIn: string, checkOut: string) => {
     setCheckInDate(checkIn);
     setCheckOutDate(checkOut);
     closeDateModal();
-    openGuestsModal();
+    if (!isMobile) toggleGuestsModal();
   };
 
   const handleGuestsSelect = (guests: {
@@ -88,12 +94,10 @@ const HotelSearchBar = () => {
     infants: number;
     pets: number;
   }) => {
-    setGuests(guests); // Update the guests state
-    console.log("Selected Guests:", guests);
+    setGuests(guests);
   };
 
   const handleSearchSubmit = () => {
-    // Find the selected city from the cachedCities
     const selectedCity = cachedCities.find(
       (city) => `${city.title}, ${city.countryName}` === toDestination
     );
@@ -103,132 +107,221 @@ const HotelSearchBar = () => {
       return;
     }
 
-    // Prepare query parameters
     const queryParams = new URLSearchParams();
     queryParams.append("cityId", selectedCity.id.toString());
-    if (checkInDate) queryParams.append("checkIn", checkInDate);
-    if (checkOutDate) queryParams.append("checkOut", checkOutDate);
+    queryParams.append("checkIn", checkInDate);
+    queryParams.append("checkOut", checkOutDate);
     queryParams.append("adults", guests.adults.toString());
     queryParams.append("children", guests.children.toString());
     queryParams.append("infants", guests.infants.toString());
     queryParams.append("pets", guests.pets.toString());
 
-    // Navigate to the hotel catalog page
     router.push(`/hotel/catalog?${queryParams.toString()}`);
   };
 
   return (
     <div className="w-full py-4">
-      <div className="flex w-full items-center justify-between gap-4">
-        {/* To Destination Button */}
-        <div className="relative flex-1 z-43">
-          <div
-            className="flex items-center gap-2 rounded-full cursor-pointer transition-all duration-300 hover:bg-gray-100"
-            onClick={toggleToModal}
-          >
-            <Image
-              src={"/assets/icons/location.svg"}
-              alt={"location"}
-              width={44}
-              height={44}
-              className="bg-[#F9F9F9] rounded-full p-2"
-            />
-            <div className="flex flex-col">
-              <Heading6 className="text-[#ADADAD]">To</Heading6>
-              <Heading6 className="text-[#4C4C4C]">
-                {toDestination || "Select destination"}
-              </Heading6>
+      {/* Mobile: Vertical Layout */}
+      {isMobile ? (
+        <div className="flex flex-col gap-4">
+          {/* To Destination */}
+          <div className="relative z-43">
+            <div
+              className="flex items-center gap-2 rounded-full cursor-pointer transition-all duration-300 hover:bg-gray-100 p-3"
+              onClick={toggleToModal}
+            >
+              <Image
+                src={"/assets/icons/location.svg"}
+                alt={"location"}
+                width={44}
+                height={44}
+                className="bg-[#F9F9F9] rounded-full p-2"
+              />
+              <div className="flex flex-col">
+                <Heading6 className="text-[#ADADAD]">To</Heading6>
+                <Heading6 className="text-[#4C4C4C]">
+                  {toDestination || "Select destination"}
+                </Heading6>
+              </div>
             </div>
           </div>
 
-          {isToModalOpen && (
-            <Modal
-              title="Select To Destination"
-              onClose={closeToModal}
-              onSelect={handleToDestinationSelect}
-              cachedCountries={cachedCountries}
-              cachedCities={cachedCities}
-              loading={loading}
-            />
-          )}
-        </div>
-
-        {/* Date Check-in/Check-out Button */}
-        <div className="relative flex-1 z-42">
-          <div
-            className="relative z-44 flex items-center gap-2 rounded-full cursor-pointer transition-all duration-300 hover:bg-gray-100"
-            onClick={toggleDateModal}
-          >
-            <Image
-              src={"/assets/icons/calendar.svg"}
-              alt={"calendar"}
-              width={44}
-              height={44}
-              className="bg-[#F9F9F9] rounded-full p-2"
-            />
-            <div className="flex flex-col">
-              <Heading6 className="text-[#ADADAD]">
-                Check in / Check out
-              </Heading6>
-              <Heading6 className="text-[#4C4C4C]">
-                {checkInDate && checkOutDate
-                  ? `${checkInDate} - ${checkOutDate}`
-                  : "Select dates"}
-              </Heading6>
+          {/* Dates */}
+          <div className="relative z-42">
+            <div
+              className="flex items-center gap-2 rounded-full cursor-pointer transition-all duration-300 hover:bg-gray-100 p-3"
+              onClick={toggleDateModal}
+            >
+              <Image
+                src={"/assets/icons/calendar.svg"}
+                alt={"calendar"}
+                width={44}
+                height={44}
+                className="bg-[#F9F9F9] rounded-full p-2"
+              />
+              <div className="flex flex-col">
+                <Heading6 className="text-[#ADADAD]">
+                  Check in / Check out
+                </Heading6>
+                <Heading6 className="text-[#4C4C4C]">
+                  {checkInDate && checkOutDate
+                    ? `${checkInDate} - ${checkOutDate}`
+                    : "Select dates"}
+                </Heading6>
+              </div>
             </div>
           </div>
 
-          {isDateModalOpen && (
-            <DateModal
-              title="Select Dates"
-              onClose={closeDateModal}
-              onSelect={handleDateSelect}
-            />
-          )}
-        </div>
-
-        {/* Add Guests Button */}
-        <div className="relative flex-1 z-42">
-          <div
-            className="relative z-42 flex items-center gap-2 rounded-full cursor-pointer transition-all duration-300 hover:bg-gray-100"
-            onClick={toggleGuestsModal}
-          >
-            <Image
-              src={"/assets/icons/user.svg"}
-              alt={"user"}
-              width={44}
-              height={44}
-              className="bg-[#F9F9F9] rounded-full p-2"
-            />
-            <div className="flex flex-col">
-              <Heading6 className="text-[#ADADAD]">Who</Heading6>
-              <Heading6 className="text-[#4C4C4C]">
-                {guests.adults + guests.children > 0
-                  ? `${guests.adults + guests.children} guests`
-                  : "Add guests"}
-              </Heading6>
+          {/* Guests */}
+          <div className="relative z-42">
+            <div
+              className="flex items-center gap-2 rounded-full cursor-pointer transition-all duration-300 hover:bg-gray-100 p-3"
+              onClick={toggleGuestsModal}
+            >
+              <Image
+                src={"/assets/icons/user.svg"}
+                alt={"user"}
+                width={44}
+                height={44}
+                className="bg-[#F9F9F9] rounded-full p-2"
+              />
+              <div className="flex flex-col">
+                <Heading6 className="text-[#ADADAD]">Who</Heading6>
+                <Heading6 className="text-[#4C4C4C]">
+                  {guests.adults + guests.children > 0
+                    ? `${guests.adults + guests.children} guests`
+                    : "Add guests"}
+                </Heading6>
+              </div>
             </div>
           </div>
 
-          {isGuestsModalOpen && (
-            <GuestsModal
-              onClose={closeGuestsModal}
-              onSelect={handleGuestsSelect}
-              initialGuests={guests}
-            />
-          )}
+          {/* Search Button */}
+          <Button
+            type="primary"
+            className="w-full py-3"
+            onClick={handleSearchSubmit}
+          >
+            Search Hotels
+          </Button>
         </div>
+      ) : (
+        /* Desktop: Horizontal Layout */
+        <div className="flex w-full items-center justify-between gap-4">
+          {/* To Destination */}
+          <div className="relative flex-1 z-43">
+            <div
+              className="flex items-center gap-2 rounded-full cursor-pointer transition-all duration-300 hover:bg-gray-100"
+              onClick={toggleToModal}
+            >
+              <Image
+                src={"/assets/icons/location.svg"}
+                alt={"location"}
+                width={44}
+                height={44}
+                className="bg-[#F9F9F9] rounded-full p-2"
+              />
+              <div className="flex flex-col">
+                <Heading6 className="text-[#ADADAD]">To</Heading6>
+                <Heading6 className="text-[#4C4C4C]">
+                  {toDestination || "Select destination"}
+                </Heading6>
+              </div>
+            </div>
+          </div>
 
-        {/* Search Button */}
-        <Button
-          type="tertiary"
-          justIcon
-          leadingIcon
-          leading="magnifer"
-          className="h-[56px] w-[56px] p-[12px]"
-          onClick={handleSearchSubmit}
+          {/* Dates */}
+          <div className="relative flex-1 z-42">
+            <div
+              className="flex items-center gap-2 rounded-full cursor-pointer transition-all duration-300 hover:bg-gray-100"
+              onClick={toggleDateModal}
+            >
+              <Image
+                src={"/assets/icons/calendar.svg"}
+                alt={"calendar"}
+                width={44}
+                height={44}
+                className="bg-[#F9F9F9] rounded-full p-2"
+              />
+              <div className="flex flex-col">
+                <Heading6 className="text-[#ADADAD]">
+                  Check in / Check out
+                </Heading6>
+                <Heading6 className="text-[#4C4C4C]">
+                  {checkInDate && checkOutDate
+                    ? `${checkInDate} - ${checkOutDate}`
+                    : "Select dates"}
+                </Heading6>
+              </div>
+            </div>
+          </div>
+
+          {/* Guests */}
+          <div className="relative flex-1 z-42">
+            <div
+              className="flex items-center gap-2 rounded-full cursor-pointer transition-all duration-300 hover:bg-gray-100"
+              onClick={toggleGuestsModal}
+            >
+              <Image
+                src={"/assets/icons/user.svg"}
+                alt={"user"}
+                width={44}
+                height={44}
+                className="bg-[#F9F9F9] rounded-full p-2"
+              />
+              <div className="flex flex-col">
+                <Heading6 className="text-[#ADADAD]">Who</Heading6>
+                <Heading6 className="text-[#4C4C4C]">
+                  {guests.adults + guests.children > 0
+                    ? `${guests.adults + guests.children} guests`
+                    : "Add guests"}
+                </Heading6>
+              </div>
+            </div>
+          </div>
+
+          {/* Search Button */}
+          <Button
+            type="tertiary"
+            justIcon
+            leadingIcon
+            leading="magnifer"
+            className="h-[56px] w-[56px] p-[12px]"
+            onClick={handleSearchSubmit}
+          />
+        </div>
+      )}
+
+      {/* Modals */}
+      {isToModalOpen && (
+        <Modal
+          title="Select To Destination"
+          onClose={closeToModal}
+          onSelect={handleToDestinationSelect}
+          cachedCountries={cachedCountries}
+          cachedCities={cachedCities}
+          loading={loading}
+          isMobile={isMobile}
         />
-      </div>
+      )}
+
+      {isDateModalOpen && (
+        <DateModal
+          title="Select Dates"
+          onClose={closeDateModal}
+          onSelect={handleDateSelect}
+          isMobile={isMobile}
+        />
+      )}
+
+      {isGuestsModalOpen && (
+        <GuestsModal
+          onClose={closeGuestsModal}
+          onSelect={handleGuestsSelect}
+          initialGuests={guests}
+          isMobile={isMobile}
+        />
+      )}
     </div>
   );
 };
@@ -237,6 +330,7 @@ const Modal = ({
   cachedCountries,
   cachedCities,
   loading,
+  isMobile,
   onClose,
   onSelect,
 }: {
@@ -246,6 +340,7 @@ const Modal = ({
   countries?: Country[];
   cities?: CityWithCountry[];
   loading?: boolean;
+  isMobile: boolean;
   onClose: () => void;
   onSelect: (value: string) => void;
 }) => {
@@ -286,7 +381,11 @@ const Modal = ({
   };
 
   return (
-    <div className="absolute top-[80px] flex items-center justify-center">
+    <div
+      className={`absolute ${
+        isMobile ? "top-full mt-2 w-full" : "top-[80px] w-[388px]"
+      }`}
+    >
       <div className="bg-white p-4 rounded-lg w-[388px] shadow-lg">
         {/* Search Input */}
         <input
@@ -394,10 +493,12 @@ const Modal = ({
 };
 
 const DateModal = ({
+  isMobile,
   onClose,
   onSelect,
 }: {
   title: string;
+  isMobile: boolean;
   onClose: () => void;
   onSelect: (checkIn: string, checkOut: string) => void;
 }) => {
@@ -805,7 +906,9 @@ const DateModal = ({
     <>
       {/* Backdrop */}
       <div
-        className="absolute top-[80px] flex items-center justify-center z-50"
+        className={`absolute ${
+          isMobile ? "top-full mt-2 w-full" : "top-[80px] w-[388px]"
+        }`}
         onClick={onClose}
       >
         {/* Modal */}
@@ -863,10 +966,18 @@ const DateModal = ({
 };
 
 const GuestsModal = ({
+  initialGuests,
+  isMobile,
   onClose,
   onSelect,
-  initialGuests,
 }: {
+  initialGuests: {
+    adults: number;
+    children: number;
+    infants: number;
+    pets: number;
+  };
+  isMobile: boolean;
   onClose: () => void;
   onSelect: (count: {
     adults: number;
@@ -874,12 +985,6 @@ const GuestsModal = ({
     infants: number;
     pets: number;
   }) => void;
-  initialGuests: {
-    adults: number;
-    children: number;
-    infants: number;
-    pets: number;
-  };
 }) => {
   const [adults, setAdults] = useState(initialGuests.adults);
   const [children, setChildren] = useState(initialGuests.children);
@@ -968,7 +1073,9 @@ const GuestsModal = ({
     <>
       {/* Backdrop */}
       <div
-        className="fixed inset-0 flex items-center justify-center z-10"
+        className={`absolute ${
+          isMobile ? "top-full mt-2 w-full" : "top-[80px] right-[50px] w-94"
+        }`}
         onClick={handleBackdropClick}
       />
       {/* Modal */}
