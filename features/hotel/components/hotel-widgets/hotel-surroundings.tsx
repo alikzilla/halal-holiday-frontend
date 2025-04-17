@@ -71,7 +71,7 @@ const HotelSurroundings = () => {
             <Heading5 className="text-[#222]">Nearby places</Heading5>
           </div>
           <div className="w-full">
-            <div className="grid grid-cols-3 gap-x-6 gap-y-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-4">
               {nearbyPlaces.map((place, index) => (
                 <div key={index} className="flex flex-col items-start gap-1">
                   <div className="w-full flex items-center justify-between">

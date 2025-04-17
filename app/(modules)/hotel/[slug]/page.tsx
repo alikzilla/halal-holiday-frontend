@@ -8,5 +8,5 @@ export default async function HotelSinglePage({
 }) {
   const { slug } = await params;
 
-  return <HotelSingle slug={slug} />;
+  return <HotelSingle />;
 }

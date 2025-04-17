@@ -7,7 +7,7 @@ import { Body2, Heading4, Heading5, Title2 } from "@/components/common";
 import { IHotel } from "@/core/types/hotels";
 import { useSearchParams } from "next/navigation";
 
-const HotelCardType1: React.FC<IHotel> = ({
+const HotelCard1: React.FC<IHotel> = ({
   id,
   title,
   source,
@@ -28,6 +28,8 @@ const HotelCardType1: React.FC<IHotel> = ({
   const buildHotelUrl = () => {
     const params = new URLSearchParams();
 
+    params.set("id", id.toString());
+
     if (searchParams.has("checkIn"))
       params.set("checkIn", searchParams.get("checkIn")!);
     if (searchParams.has("checkOut"))
@@ -47,7 +49,7 @@ const HotelCardType1: React.FC<IHotel> = ({
       href={buildHotelUrl()}
       className="flex flex-col items-start gap-[8px] overflow-hidden border border-[1px] border-[#F2F2F2] p-2 rounded-xl shadow-sm transition-all duration-300 hover:shadow-lg"
     >
-      <div className="relative">
+      <div className="relative w-full aspect-[4/3]">
         <div className="absolute z-[1] bottom-0 left-0 w-full h-1/3 backdrop-blur-md mask-gradient rounded-lg"></div>
         <div className="absolute z-[1] top-3 right-3 bg-[#FFFFFF33]/20 backdrop-blur-lg flex items-center gap-2 text-white rounded-[30px] py-1 px-3">
           <Image
@@ -56,19 +58,18 @@ const HotelCardType1: React.FC<IHotel> = ({
             height={18}
             width={18}
           />{" "}
-          4.5
+          {stars}
         </div>
         <Image
           src={`https://halalholidaycheck.com/images/properties/${photo}`}
           alt={title || "Hotel image"}
-          width={100}
-          height={100}
-          className="w-full h-48 object-cover rounded-xl"
+          fill
+          className="object-cover rounded-xl"
         />
       </div>
 
-      <div className="flex flex-col items-start gap-6 p-2">
-        <Heading5 className="text-[#222222]">{title}</Heading5>
+      <div className="flex flex-col items-start gap-2 p-2 w-full">
+        <Heading5 className="text-[#222222] line-clamp-2">{title}</Heading5>
         <Body2 className="inline-flex items-center gap-1 text-[#ADADAD]">
           <Image
             src={"/assets/icons/location-grey.svg"}
@@ -78,21 +79,17 @@ const HotelCardType1: React.FC<IHotel> = ({
           />{" "}
           {city_title}, {country_title}
         </Body2>
-        {/* <Body2 className="text-black py-2 px-3 bg-[#F9F9F9] rounded-[30px]">
-          {bedType}
-        </Body2> */}
-        <div className="flex flex-col items-start gap-1">
-          {/* <Title2 className="text-[#919191]">
-            {duration}, {guests}
-          </Title2> */}
+        <div className="flex flex-col items-start gap-1 w-full mt-2">
           <Heading4 className="text-[#266462]">
             ${price && price.toFixed(2)}
           </Heading4>
-          <Title2 className="text-[#919191]">Include taxes and chagers</Title2>
+          <Title2 className="text-[#919191] text-sm">
+            Include taxes and charges
+          </Title2>
         </div>
       </div>
     </Link>
   );
 };
 
-export default HotelCardType1;
+export default HotelCard1;

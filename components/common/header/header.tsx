@@ -5,7 +5,7 @@ import { cn } from "@/core/lib/utils";
 import Image from "next/image";
 import { Link, Button } from "@/components/ui";
 import { Container } from "@/components/common";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 
 const Header = ({ isTransparent = false }: { isTransparent?: boolean }) => {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -17,6 +17,7 @@ const Header = ({ isTransparent = false }: { isTransparent?: boolean }) => {
   const [windowWidth, setWindowWidth] = useState(0);
 
   const pathname = usePathname();
+  const router = useRouter();
 
   const currencies = ["EUR", "TRY", "RUB", "GBP", "USD"];
   const languages = ["Ru", "En", "Tu", "Fr", "De", "Du", "العربية"];
@@ -204,7 +205,9 @@ const Header = ({ isTransparent = false }: { isTransparent?: boolean }) => {
               <Button type="gradient" leadingIcon={true} leading="star">
                 Be a platinum
               </Button>
-              <Button type="secondary">Login</Button>
+              <Button type="secondary" onClick={() => router.push("/login")}>
+                Login
+              </Button>
             </div>
           )}
         </section>
@@ -318,7 +321,11 @@ const Header = ({ isTransparent = false }: { isTransparent?: boolean }) => {
                 >
                   Be a platinum
                 </Button>
-                <Button type="secondary" className="w-full">
+                <Button
+                  type="secondary"
+                  onClick={() => router.push("/login")}
+                  className="w-full"
+                >
                   Login
                 </Button>
               </div>

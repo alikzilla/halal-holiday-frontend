@@ -22,9 +22,6 @@ const HotelNavbar = () => {
     []
   );
 
-  // Calculate equal width for each tab
-  const tabWidth = `${100 / sections.length}%`;
-
   const handleScroll = (id: string) => {
     const element = document.getElementById(id);
     if (element) {
@@ -83,33 +80,31 @@ const HotelNavbar = () => {
   }, [activeSection, sections]);
 
   return (
-    <nav className="sticky top-[80px] bg-white z-40 border-b border-gray-100 w-full">
-      <div ref={containerRef} className="w-full relative overflow-hidden">
-        <div ref={navRef} className="flex  w-full relative">
+    <nav className="sticky top-[80px] bg-white z-40 border-b border-gray-100 w-full overflow-x-auto">
+      <div ref={containerRef} className="w-full relative">
+        <div ref={navRef} className="flex w-max md:w-full relative min-w-full">
           {sections.map((section) => {
             const sectionId = section.toLowerCase().replace(/ /g, "-");
             return (
               <button
                 key={sectionId}
                 onClick={() => handleScroll(sectionId)}
-                className={`flex-1 text-sm text-center px-3 py-4 whitespace-nowrap transition-colors duration-200 ${
+                className={`flex-1 text-sm text-center px-3 py-4 whitespace-nowrap transition-colors duration-200 min-w-[120px] ${
                   activeSection === sectionId
                     ? "text-[#222] font-medium"
                     : "text-gray-500 hover:text-[#222]"
                 }`}
-                style={{ minWidth: tabWidth }}
               >
-                {section}
+                {section.split(" ")[0]}
               </button>
             );
           })}
 
-          {/* Full-width animated underline */}
           <div
             ref={underlineRef}
-            className="absolute z-2 bottom-0 left-0 h-[2px] bg-[#222] transition-all duration-300 ease-out"
+            className="absolute z-2 bottom-0 h-[2px] bg-[#222] transition-all duration-300 ease-out"
             style={{
-              width: tabWidth,
+              width: `${100 / sections.length}%`,
               transform: "translateX(0)",
             }}
           />

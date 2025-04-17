@@ -18,8 +18,8 @@ const HotelHeader = ({
   const emptyStars = 5 - fullStars - (hasHalfStar ? 1 : 0);
 
   return (
-    <div className="w-full flex items-center justify-between">
-      <div className="flex flex-col items-center justify-start gap-2">
+    <div className="w-full flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+      <div className="flex flex-col items-start justify-start gap-2">
         <Heading4 className="text-[#222]">{title}</Heading4>
         <span className="w-full flex items-center justify-start gap-[0.5px]">
           <Image
@@ -34,8 +34,8 @@ const HotelHeader = ({
         </span>
       </div>
 
-      <div className="flex items-center justify-end gap-2">
-        <div className="flex flex-col items-end justify-end mr-2">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-end gap-2 w-full md:w-auto">
+        <div className="flex items-center gap-2">
           <div className="flex items-center gap-[5.5px]">
             {[...Array(rating)].map((_, i) => (
               <Image
@@ -46,7 +46,6 @@ const HotelHeader = ({
                 height={16}
               />
             ))}
-
             {hasHalfStar && (
               <Image
                 src={"/assets/icons/star-half.svg"}
@@ -55,8 +54,7 @@ const HotelHeader = ({
                 height={16}
               />
             )}
-
-            {/* {[...Array(rating - 5)].map((_, i) => (
+            {[...Array(rating)].map((_, i) => (
               <Image
                 key={`empty-${i}`}
                 src={"/assets/icons/star-gray.svg"}
@@ -64,12 +62,15 @@ const HotelHeader = ({
                 width={16}
                 height={16}
               />
-            ))} */}
+            ))}
           </div>
-          <Title1 className="text-[#222] underline">34 reviews</Title1>
+          <Button type="black" className="text-sm">
+            {Number(rating).toFixed(1)}
+          </Button>
         </div>
-        <Button type="black">{Number(rating).toFixed(1)}</Button>
-        <Button type="secondary">Share</Button>
+        <Button type="secondary" className="text-sm">
+          Share
+        </Button>
       </div>
     </div>
   );

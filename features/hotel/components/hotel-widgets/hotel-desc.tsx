@@ -2,7 +2,7 @@ import React from "react";
 import Image from "next/image";
 import { Heading5, Body2 } from "@/components/common";
 
-const HotelDescription = ({ description }: { description: string }) => {
+const HotelDesc = ({ description }: { description: string }) => {
   const facilities = [
     {
       name: "Non-smoking rooms",
@@ -47,9 +47,12 @@ const HotelDescription = ({ description }: { description: string }) => {
   ];
 
   return (
-    <div id="overview" className="w-full flex items-start gap-6 py-4">
+    <div
+      id="overview"
+      className="w-full flex flex-col lg:flex-row items-start gap-6 py-4"
+    >
       {/* Description Section */}
-      <section className="w-full">
+      <section className="w-full lg:w-1/2">
         <div className="flex flex-col items-start gap-8">
           <div className="w-full">
             <Heading5 className="text-[#222]">Description</Heading5>
@@ -62,7 +65,7 @@ const HotelDescription = ({ description }: { description: string }) => {
       </section>
 
       {/* Facilities Section */}
-      <section className="w-full">
+      <section className="w-full lg:w-1/2">
         <div className="flex flex-col items-start gap-8">
           <div className="w-full">
             <Heading5 className="text-[#222]">Most popular facilities</Heading5>
@@ -70,7 +73,6 @@ const HotelDescription = ({ description }: { description: string }) => {
           </div>
           <div className="w-full">
             <div className="flex items-center justify-start flex-wrap gap-[10px]">
-              {/* Facility items with emoji indicators */}
               {facilities.map((facility, index) => (
                 <div
                   key={index}
@@ -82,7 +84,7 @@ const HotelDescription = ({ description }: { description: string }) => {
                     width={20}
                     height={20}
                   />
-                  <span>{facility.name}</span>
+                  <span className="text-sm">{facility.name}</span>
                 </div>
               ))}
             </div>
@@ -93,4 +95,4 @@ const HotelDescription = ({ description }: { description: string }) => {
   );
 };
 
-export default HotelDescription;
+export default HotelDesc;

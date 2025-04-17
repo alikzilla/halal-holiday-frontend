@@ -71,7 +71,7 @@ export const useHotelsSearch = () => {
   return { hotels, loading, error };
 };
 
-export const useHotelSearch = (hotelId: string): HotelSearchResponse => {
+export const useHotelSearch = (): HotelSearchResponse => {
   const [hotel, setHotel] = useState<HotelProperty>();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -83,6 +83,7 @@ export const useHotelSearch = (hotelId: string): HotelSearchResponse => {
         setLoading(true);
         setError(null);
 
+        const hotelId = searchParams.get("id");
         const checkIn = searchParams.get("checkIn");
         const checkOut = searchParams.get("checkOut");
         const adults = searchParams.get("adults");
@@ -95,7 +96,7 @@ export const useHotelSearch = (hotelId: string): HotelSearchResponse => {
 
         const requestBody = {
           type: "hotel",
-          ID: "1",
+          ID: hotelId,
           checkin: "2025-06-10",
           checkout: "2025-06-15",
           adults: [2],
@@ -133,7 +134,7 @@ export const useHotelSearch = (hotelId: string): HotelSearchResponse => {
     };
 
     fetchHotel();
-  }, [hotelId, searchParams]);
+  }, [searchParams]);
 
   return { hotel, loading, error };
 };

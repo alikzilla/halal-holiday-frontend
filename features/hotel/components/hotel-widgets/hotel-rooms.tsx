@@ -9,6 +9,7 @@ import {
   Heading4,
   Title2,
   Heading2,
+  Heading1,
 } from "@/components/common";
 import { Button } from "@/components/ui";
 
@@ -151,14 +152,14 @@ const HotelRooms = () => {
   const [selectedOption, setSelectedOption] = useState<number | null>(null);
 
   return (
-    <div id="rooms" className="w-full py-4">
+    <div id="rooms" className="w-full py-4 pt-[50px]">
       <div className="w-full mb-8">
-        <Heading5 className="text-[#222]">Rooms</Heading5>
+        <Heading5 className="text-2xl font-bold">Rooms</Heading5>
         <div className="w-full h-[1px] bg-[#F2F2F2] mt-2"></div>
       </div>
 
-      <div className="h-full flex items-center gap-[10px] mb-6">
-        <div className="flex-1 px-3 py-2 border border-[#F2F2F2] flex items-center gap-2 rounded-lg transition-all duration-300 hover:bg-gray-100">
+      <div className="flex flex-col md:flex-row items-center gap-3 mb-6">
+        <div className="w-full md:flex-1 px-3 py-2 border border-[#F2F2F2] flex items-center gap-2 rounded-lg transition-all duration-300 hover:bg-gray-100">
           <Image
             src={"/assets/icons/calendar.svg"}
             alt={"calendar"}
@@ -173,7 +174,7 @@ const HotelRooms = () => {
             </Heading6>
           </div>
         </div>
-        <div className="flex-1 px-3 py-2 border border-[#F2F2F2] flex items-center gap-2 rounded-lg transition-all duration-300 hover:bg-gray-100">
+        <div className="w-full md:flex-1 px-3 py-2 border border-[#F2F2F2] flex items-center gap-2 rounded-lg transition-all duration-300 hover:bg-gray-100">
           <Image
             src={"/assets/icons/user.svg"}
             alt={"user"}
@@ -188,7 +189,7 @@ const HotelRooms = () => {
             </Heading6>
           </div>
         </div>
-        <Button type="tertiary" className="w-[160px] h-[60px]">
+        <Button type="tertiary" className="w-full md:w-[160px] h-[60px]">
           Find Room
         </Button>
       </div>
@@ -197,43 +198,103 @@ const HotelRooms = () => {
         {roomTypes.map((room, index) => (
           <div
             key={index}
-            className="w-full h-[250px] flex items-start gap-[10px]"
+            className="w-full flex flex-col lg:flex-row items-start gap-4 p-4 border rounded-lg"
           >
-            <Image
-              src={room.image}
-              alt={room.name}
-              width={250}
-              height={250}
-              className="w-[250px] h-[250px] rounded-lg"
-            />
+            <div className="w-full lg:w-[250px] h-[200px] lg:h-[250px]">
+              <Image
+                src={room.image}
+                alt={room.name}
+                width={250}
+                height={250}
+                className="w-full h-full object-cover rounded-lg"
+              />
+            </div>
 
-            <div className="w-[500px] flex-1 py-4">
-              <Heading3 className="text-[24px] font-semibold leading-[147%] mb-6">
-                {room.name}
-              </Heading3>
-              <div className="flex items-center justify-start flex-wrap gap-[10px]">
-                {/* Facility items with emoji indicators */}
-                {room.facilities.map((facility, index) => (
-                  <div
-                    key={index}
-                    className="flex items-center gap-[6px] bg-[#F9F9F9] py-1 px-2 rounded-[30px]"
-                  >
-                    <Image
-                      src={facility.icon}
-                      alt="no smoke"
-                      width={18}
-                      height={18}
-                    />
-                    <span>{facility.name}</span>
-                  </div>
-                ))}
+            <div className="flex-1 w-full">
+              <div className="py-2 lg:py-4">
+                <Heading3 className="text-xl lg:text-2xl font-semibold mb-4 lg:mb-6">
+                  {room.name}
+                </Heading3>
+                <div className="flex items-center justify-start flex-wrap gap-2">
+                  {room.facilities.map((facility, index) => (
+                    <div
+                      key={index}
+                      className="flex items-center gap-1 bg-[#F9F9F9] py-1 px-2 rounded-[30px] text-sm"
+                    >
+                      <Image
+                        src={facility.icon}
+                        alt={facility.name}
+                        width={16}
+                        height={16}
+                      />
+                      <span className="whitespace-nowrap">{facility.name}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div className="mt-4 lg:hidden">
+                <div className="mb-4">
+                  <Heading4>Accommodation Options</Heading4>
+                </div>
+                <div className="flex flex-col gap-3">
+                  {room.accommodationOptions.map((option, index) => (
+                    <div
+                      key={index}
+                      className={`w-full flex items-center justify-between p-3 border rounded-lg cursor-pointer transition-colors ${
+                        selectedOption === index
+                          ? "bg-[#E4ECEC] border-[#266462]"
+                          : "hover:bg-[#F9F9F9]"
+                      } ${
+                        option.description === "Platinum Member Special"
+                          ? "border-none text-white"
+                          : ""
+                      }`}
+                      style={{
+                        backgroundImage:
+                          option.description === "Platinum Member Special"
+                            ? `var(--gradient)`
+                            : undefined,
+                      }}
+                      onClick={() => setSelectedOption(index)}
+                    >
+                      <div className="w-full flex justify-between items-center">
+                        <div>
+                          {option.description && (
+                            <Title2 className="text-[#FFFFFF]">
+                              {option.description}
+                            </Title2>
+                          )}
+                          <Heading5
+                            className={`${
+                              option.description === "Platinum Member Special"
+                                ? "text-white"
+                                : "text-[#222]"
+                            }`}
+                          >
+                            {option.name}
+                          </Heading5>
+                        </div>
+                        <Heading5
+                          className={`${
+                            option.description === "Platinum Member Special"
+                              ? "text-white"
+                              : "text-[#222]"
+                          }`}
+                        >
+                          {option.price} TL
+                        </Heading5>
+                      </div>
+                    </div>
+                  ))}
+                </div>
               </div>
             </div>
-            <div className="flex-1 p-4">
+
+            <div className="hidden lg:block flex-1 p-4">
               <div className="mb-6">
                 <Heading4>Accommodation Options</Heading4>
               </div>
-
               <div className="flex flex-col gap-4">
                 {room.accommodationOptions.map((option, index) => (
                   <div
@@ -263,20 +324,20 @@ const HotelRooms = () => {
                           </Title2>
                         )}
                         <Heading5
-                          className={`text-[#222] ${
+                          className={`${
                             option.description === "Platinum Member Special"
                               ? "text-white"
-                              : ""
+                              : "text-[#222]"
                           }`}
                         >
                           {option.name}
                         </Heading5>
                       </div>
                       <Heading5
-                        className={`text-[#222] ${
+                        className={`${
                           option.description === "Platinum Member Special"
                             ? "text-white"
-                            : ""
+                            : "text-[#222]"
                         }`}
                       >
                         {option.price} TL
@@ -286,12 +347,13 @@ const HotelRooms = () => {
                 ))}
               </div>
             </div>
-            <div className="h-full flex flex-1 flex-col items-end justify-end gap-2">
-              <div className="flex flex-col items-end justify-end gap-1">
+
+            <div className="w-full lg:w-auto flex flex-col items-start lg:items-end justify-between gap-4 mt-4 lg:mt-0">
+              <div className="flex flex-col items-start lg:items-end gap-1">
                 <Title2>{room.duration}</Title2>
                 <Heading2 className="text-[#266462]">12.120 TL</Heading2>
               </div>
-              <Button>Reserve room</Button>
+              <Button className="w-full lg:w-auto">Reserve room</Button>
             </div>
           </div>
         ))}

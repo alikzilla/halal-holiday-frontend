@@ -11,27 +11,57 @@ import {
   HotelSearchBar,
 } from "../components";
 import { useHotelsSearch } from "../core/hooks/use-hotels";
+import { Button } from "@/components/ui";
+import { useMediaQuery } from "@/core/hooks/use-media-query";
 
 const Hotels = () => {
   const [layout, setLayout] = useState<"grid" | "flex">("grid");
   const { hotels, loading, error } = useHotelsSearch();
+  const [showFilters, setShowFilters] = useState(false);
+  const isMobile = useMediaQuery("(max-width: 768px)");
 
   return (
     <Layout isTransparent={false}>
       <Container className="pt-[80px] pb-[80px]">
         <HotelSearchBar />
         <Breadcrumb />
-        <div className="flex">
-          <FilterHotel />
-          <div className="flex-1 ml-6">
+
+        {/* Mobile filter toggle button */}
+        {isMobile && (
+          <Button
+            type="secondary"
+            className="mb-4 w-full"
+            onClick={() => setShowFilters(!showFilters)}
+          >
+            {showFilters ? "Hide Filters" : "Show Filters"}
+          </Button>
+        )}
+
+        <div className="flex flex-col md:flex-row">
+          {/* Filters - shown always on desktop, conditionally on mobile */}
+          {(showFilters || !isMobile) && (
+            <div className="w-full md:w-[272px] mb-4 md:mb-0 md:mr-6">
+              <FilterHotel />
+            </div>
+          )}
+
+          <div className="flex-1">
             <FilterHeader />
-            <CatalogHeader count={hotels.length} onLayoutChange={setLayout} />
+            <CatalogHeader
+              count={hotels.length}
+              onLayoutChange={setLayout}
+              isMobile={isMobile}
+            />
             {loading ? (
               <Loader />
             ) : error ? (
               <Error error={error} />
             ) : (
-              <CatalogHotel hotels={hotels} layout={layout} />
+              <CatalogHotel
+                hotels={hotels}
+                layout={isMobile ? "flex" : layout}
+                isMobile={isMobile}
+              />
             )}
           </div>
         </div>
