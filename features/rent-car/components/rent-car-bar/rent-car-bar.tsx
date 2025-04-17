@@ -1,41 +1,53 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Image from "next/image";
 import { Heading6, Title1 } from "@/components/common";
 import { Button } from "@/components/ui";
 import { cn } from "@/core/lib/utils";
+import { useRouter } from "next/navigation";
 
 const RentCarSearchBar = () => {
   const [isFromModalOpen, setIsFromModalOpen] = useState(false);
   const [isDateModalOpen, setIsDateModalOpen] = useState(false);
   const [isCarModalOpen, setIsCarModalOpen] = useState(false);
+  const [windowWidth, setWindowWidth] = useState(0);
 
   const [fromDestination, setFromDestination] = useState("");
   const [pickUpDate, setPickUpDate] = useState("");
   const [dropOffDate, setDropOffDate] = useState("");
   const [carModel, setCarModel] = useState("");
 
-  // const openFromModal = () => setIsFromModalOpen(true);
-  const openDateModal = () => setIsDateModalOpen(true);
-  const openCarModal = () => setIsCarModalOpen(true);
+  const router = useRouter();
+  const isMobile = windowWidth <= 768;
+
+  useEffect(() => {
+    const handleResize = () => {
+      setWindowWidth(window.innerWidth);
+    };
+
+    setWindowWidth(window.innerWidth);
+    window.addEventListener("resize", handleResize);
+
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
   const toggleFromModal = () => {
     setIsFromModalOpen(!isFromModalOpen);
-    closeDateModal();
-    closeCarModal();
+    setIsDateModalOpen(false);
+    setIsCarModalOpen(false);
   };
 
   const toggleDateModal = () => {
     setIsDateModalOpen(!isDateModalOpen);
-    closeFromModal();
-    closeCarModal();
+    setIsFromModalOpen(false);
+    setIsCarModalOpen(false);
   };
 
-  const toggleGuestsModal = () => {
+  const toggleCarModal = () => {
     setIsCarModalOpen(!isCarModalOpen);
-    closeFromModal();
-    closeDateModal();
+    setIsFromModalOpen(false);
+    setIsDateModalOpen(false);
   };
 
   const closeFromModal = () => setIsFromModalOpen(false);
@@ -45,188 +57,299 @@ const RentCarSearchBar = () => {
   const handleFromDestinationSelect = (destination: string) => {
     setFromDestination(destination);
     closeFromModal();
-    openDateModal();
+    if (!isMobile) toggleDateModal();
   };
 
   const handleDateSelect = (pickUp: string, dropOff: string) => {
     setPickUpDate(pickUp);
     setDropOffDate(dropOff);
     closeDateModal();
-    openCarModal();
+    if (!isMobile) toggleCarModal();
   };
 
   const handleCarModalSelect = (carModel: string) => {
     setCarModel(carModel);
-    console.log(carModel);
+  };
+
+  const handleSearchSubmit = () => {
+    const queryParams = new URLSearchParams();
+    if (fromDestination) queryParams.append("location", fromDestination);
+    if (pickUpDate) queryParams.append("pickUp", pickUpDate);
+    if (dropOffDate) queryParams.append("dropOff", dropOffDate);
+    if (carModel) queryParams.append("model", carModel);
+
+    router.push(`/cars/search?${queryParams.toString()}`);
   };
 
   return (
     <div className="w-full py-4">
-      <div className="flex w-full items-center justify-between gap-4">
-        {/* From Destination Button */}
-        <div className="relative flex-1 z-43">
-          <div
-            className="flex items-center gap-2 rounded-full cursor-pointer transition-all duration-300 hover:bg-gray-100"
-            onClick={toggleFromModal}
-          >
-            <Image
-              src={"/assets/icons/location.svg"}
-              alt={"location"}
-              width={44}
-              height={44}
-              className="bg-[#F9F9F9] rounded-full p-2"
-            />
-            <div className="flex flex-col">
-              <Heading6 className="text-[#ADADAD]">From</Heading6>
-              <Heading6 className="text-[#4C4C4C]">
-                {fromDestination || "Select destination"}
-              </Heading6>
+      {/* Mobile: Vertical Layout */}
+      {isMobile ? (
+        <div className="flex flex-col gap-4">
+          {/* From Destination */}
+          <div className="relative z-43">
+            <div
+              className="flex items-center gap-2 rounded-full cursor-pointer transition-all duration-300 hover:bg-gray-100 p-3"
+              onClick={toggleFromModal}
+            >
+              <Image
+                src={"/assets/icons/location.svg"}
+                alt={"location"}
+                width={44}
+                height={44}
+                className="bg-[#F9F9F9] rounded-full p-2"
+              />
+              <div className="flex flex-col">
+                <Heading6 className="text-[#ADADAD]">Location</Heading6>
+                <Heading6 className="text-[#4C4C4C]">
+                  {fromDestination || "Select location"}
+                </Heading6>
+              </div>
             </div>
           </div>
 
-          {isFromModalOpen && (
-            <Modal
-              title="Select From Destination"
-              onClose={closeFromModal}
-              onSelect={handleFromDestinationSelect}
-            />
-          )}
-        </div>
-
-        {/* Date Pick up/Drop off Button */}
-        <div className="relative flex-1 z-42">
-          <div
-            className="relative z-44 flex items-center gap-2 rounded-full cursor-pointer transition-all duration-300 hover:bg-gray-100"
-            onClick={toggleDateModal}
-          >
-            <Image
-              src={"/assets/icons/calendar.svg"}
-              alt={"calendar"}
-              width={44}
-              height={44}
-              className="bg-[#F9F9F9] rounded-full p-2"
-            />
-            <div className="flex flex-col">
-              <Heading6 className="text-[#ADADAD]">
-                Pick Up / Drop-off date
-              </Heading6>
-              <Heading6 className="text-[#4C4C4C]">
-                {pickUpDate && dropOffDate
-                  ? `${pickUpDate} - ${dropOffDate}`
-                  : "Add dates"}
-              </Heading6>
+          {/* Dates */}
+          <div className="relative z-42">
+            <div
+              className="flex items-center gap-2 rounded-full cursor-pointer transition-all duration-300 hover:bg-gray-100 p-3"
+              onClick={toggleDateModal}
+            >
+              <Image
+                src={"/assets/icons/calendar.svg"}
+                alt={"calendar"}
+                width={44}
+                height={44}
+                className="bg-[#F9F9F9] rounded-full p-2"
+              />
+              <div className="flex flex-col">
+                <Heading6 className="text-[#ADADAD]">
+                  Pick Up / Drop-off
+                </Heading6>
+                <Heading6 className="text-[#4C4C4C]">
+                  {pickUpDate && dropOffDate
+                    ? `${pickUpDate} - ${dropOffDate}`
+                    : "Select dates"}
+                </Heading6>
+              </div>
             </div>
           </div>
 
-          {isDateModalOpen && (
-            <DateModal
-              title="Select Dates"
-              onClose={closeDateModal}
-              onSelect={handleDateSelect}
-            />
-          )}
-        </div>
-
-        {/* Add Guests Button */}
-        <div className="relative flex-1 z-42">
-          <div
-            className="relative z-42 flex items-center gap-2 rounded-full cursor-pointer transition-all duration-300 hover:bg-gray-100"
-            onClick={toggleGuestsModal}
-          >
-            <Image
-              src={"/assets/icons/car.svg"}
-              alt={"car"}
-              width={44}
-              height={44}
-              className="bg-[#F9F9F9] rounded-full p-2"
-            />
-            <div className="flex flex-col">
-              <Heading6 className="text-[#ADADAD]">Car</Heading6>
-              <Heading6 className="text-[#4C4C4C]">
-                {carModel ? `${carModel}` : "Choose model"}
-              </Heading6>
+          {/* Car Model */}
+          <div className="relative z-42">
+            <div
+              className="flex items-center gap-2 rounded-full cursor-pointer transition-all duration-300 hover:bg-gray-100 p-3"
+              onClick={toggleCarModal}
+            >
+              <Image
+                src={"/assets/icons/car.svg"}
+                alt={"car"}
+                width={44}
+                height={44}
+                className="bg-[#F9F9F9] rounded-full p-2"
+              />
+              <div className="flex flex-col">
+                <Heading6 className="text-[#ADADAD]">Car Model</Heading6>
+                <Heading6 className="text-[#4C4C4C]">
+                  {carModel || "Choose model"}
+                </Heading6>
+              </div>
             </div>
           </div>
 
-          {isCarModalOpen && (
-            <CarModal onClose={closeCarModal} onSelect={handleCarModalSelect} />
-          )}
+          {/* Search Button */}
+          <Button
+            type="primary"
+            className="w-full py-3"
+            onClick={handleSearchSubmit}
+          >
+            Search Cars
+          </Button>
         </div>
+      ) : (
+        /* Desktop: Horizontal Layout */
+        <div className="flex w-full items-center justify-between gap-4">
+          {/* From Destination */}
+          <div className="relative flex-1 z-43">
+            <div
+              className="flex items-center gap-2 rounded-full cursor-pointer transition-all duration-300 hover:bg-gray-100"
+              onClick={toggleFromModal}
+            >
+              <Image
+                src={"/assets/icons/location.svg"}
+                alt={"location"}
+                width={44}
+                height={44}
+                className="bg-[#F9F9F9] rounded-full p-2"
+              />
+              <div className="flex flex-col">
+                <Heading6 className="text-[#ADADAD]">Location</Heading6>
+                <Heading6 className="text-[#4C4C4C]">
+                  {fromDestination || "Select location"}
+                </Heading6>
+              </div>
+            </div>
+          </div>
 
-        {/* Search Button */}
-        <Button
-          type="tertiary"
-          justIcon
-          leadingIcon
-          leading="magnifer"
-          className="h-[56px] w-[56px] p-[12px]"
+          {/* Dates */}
+          <div className="relative flex-1 z-42">
+            <div
+              className="flex items-center gap-2 rounded-full cursor-pointer transition-all duration-300 hover:bg-gray-100"
+              onClick={toggleDateModal}
+            >
+              <Image
+                src={"/assets/icons/calendar.svg"}
+                alt={"calendar"}
+                width={44}
+                height={44}
+                className="bg-[#F9F9F9] rounded-full p-2"
+              />
+              <div className="flex flex-col">
+                <Heading6 className="text-[#ADADAD]">
+                  Pick Up / Drop-off
+                </Heading6>
+                <Heading6 className="text-[#4C4C4C]">
+                  {pickUpDate && dropOffDate
+                    ? `${pickUpDate} - ${dropOffDate}`
+                    : "Select dates"}
+                </Heading6>
+              </div>
+            </div>
+          </div>
+
+          {/* Car Model */}
+          <div className="relative flex-1 z-42">
+            <div
+              className="flex items-center gap-2 rounded-full cursor-pointer transition-all duration-300 hover:bg-gray-100"
+              onClick={toggleCarModal}
+            >
+              <Image
+                src={"/assets/icons/car.svg"}
+                alt={"car"}
+                width={44}
+                height={44}
+                className="bg-[#F9F9F9] rounded-full p-2"
+              />
+              <div className="flex flex-col">
+                <Heading6 className="text-[#ADADAD]">Car Model</Heading6>
+                <Heading6 className="text-[#4C4C4C]">
+                  {carModel || "Choose model"}
+                </Heading6>
+              </div>
+            </div>
+          </div>
+
+          {/* Search Button */}
+          <Button
+            type="tertiary"
+            justIcon
+            leadingIcon
+            leading="magnifer"
+            className="h-[56px] w-[56px] p-[12px]"
+            onClick={handleSearchSubmit}
+          />
+        </div>
+      )}
+
+      {/* Modals */}
+      {isFromModalOpen && (
+        <Modal
+          title="Select Location"
+          onClose={closeFromModal}
+          onSelect={handleFromDestinationSelect}
+          isMobile={isMobile}
         />
-      </div>
+      )}
+
+      {isDateModalOpen && (
+        <DateModal
+          title="Select Dates"
+          onClose={closeDateModal}
+          onSelect={handleDateSelect}
+          isMobile={isMobile}
+        />
+      )}
+
+      {isCarModalOpen && (
+        <CarModal
+          onClose={closeCarModal}
+          onSelect={handleCarModalSelect}
+          isMobile={isMobile}
+        />
+      )}
     </div>
   );
 };
 
-// Destination Modal Component
+// Location Modal Component
 const Modal = ({
+  isMobile,
   onClose,
   onSelect,
 }: {
   title: string;
+  isMobile: boolean;
   onClose: () => void;
   onSelect: (value: string) => void;
 }) => {
   const [searchQuery, setSearchQuery] = useState("");
   const [, setSelectedDestination] = useState("");
 
-  // Suggested destinations
-  const destinations = [
-    { name: "Tbilisi, Georgia", description: "Family Friendly" },
-    { name: "Baku, Azerbaijan", description: "For night life" },
-    { name: "Istanbul, Turkey", description: "Popular beach placing" },
-    { name: "Batumi, Georgia", description: "For muslim people" },
-    { name: "London, UK", description: "For architecture" },
+  // Suggested locations
+  const locations = [
+    { name: "Tbilisi, Georgia", description: "City Center" },
+    { name: "Baku, Azerbaijan", description: "Airport" },
+    { name: "Istanbul, Turkey", description: "Downtown" },
+    { name: "Batumi, Georgia", description: "Seaside" },
+    { name: "London, UK", description: "Heathrow Airport" },
   ];
 
-  // Filter destinations based on search query
-  const filteredDestinations = destinations.filter((destination) =>
-    destination.name.toLowerCase().includes(searchQuery.toLowerCase())
+  // Filter locations based on search query
+  const filteredLocations = locations.filter((location) =>
+    location.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  // Handle destination selection
+  // Handle location selection
   const handleSelectDestination = (destination: string) => {
     setSelectedDestination(destination);
-    onSelect(destination); // Pass the selected destination to the parent
-    onClose(); // Close the modal after selection
+    onSelect(destination);
+    onClose();
   };
 
   // Handle Enter key press
   const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter") {
-      onClose(); // Close the modal on Enter
+      onClose();
     }
   };
 
   return (
-    <div className="absolute top-[80px] flex items-center justify-center">
-      <div className="bg-white p-4 rounded-lg w-[388px] shadow-lg">
+    <div
+      className={`absolute ${
+        isMobile ? "top-full mt-2 w-full" : "top-[80px] w-[388px]"
+      }`}
+    >
+      <div className="bg-white p-4 rounded-lg shadow-lg">
         {/* Search Input */}
         <input
           type="text"
-          placeholder="Search destination"
+          placeholder="Search location"
           className="w-full px-3 py-4 border border-[#F2F2F2] rounded-xl mb-4"
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           onKeyDown={handleKeyPress}
         />
 
-        <Title1 className="text-black mb-6">Suggested destinations</Title1>
-        {/* Suggested Destinations */}
+        {!searchQuery && (
+          <Title1 className="text-black mb-6">Suggested locations</Title1>
+        )}
+
+        {/* Suggested Locations */}
         <div className="space-y-3">
-          {filteredDestinations.map((destination, index) => (
+          {filteredLocations.map((location, index) => (
             <div
               key={index}
-              className="flex items-center justify-start gap-2 rounded-full hover:bg-gray-100 rounded cursor-pointer"
-              onClick={() => handleSelectDestination(destination.name)}
+              className="flex items-center justify-start gap-2 rounded-full hover:bg-gray-100 cursor-pointer p-2"
+              onClick={() => handleSelectDestination(location.name)}
             >
               <Image
                 src={"/assets/icons/location.svg"}
@@ -236,10 +359,8 @@ const Modal = ({
                 className="bg-[#F9F9F9] rounded-full p-2"
               />
               <div>
-                <p className="font-medium">{destination.name}</p>
-                <p className="text-sm text-gray-500">
-                  {destination.description}
-                </p>
+                <p className="font-medium">{location.name}</p>
+                <p className="text-sm text-gray-500">{location.description}</p>
               </div>
             </div>
           ))}
@@ -250,25 +371,20 @@ const Modal = ({
 };
 
 const DateModal = ({
+  isMobile,
   onClose,
   onSelect,
 }: {
   title: string;
+  isMobile: boolean;
   onClose: () => void;
-  onSelect: (checkIn: string, checkOut: string) => void;
+  onSelect: (pickUp: string, dropOff: string) => void;
 }) => {
-  const [checkIn, setCheckIn] = useState<Date | null>(null);
-  const [checkOut, setCheckOut] = useState<Date | null>(null);
+  const [pickUp, setPickUp] = useState<Date | null>(null);
+  const [dropOff, setDropOff] = useState<Date | null>(null);
   const [currentMonth, setCurrentMonth] = useState(new Date().getMonth());
   const [currentYear, setCurrentYear] = useState(new Date().getFullYear());
   const [view, setView] = useState<"calendar" | "year" | "month">("calendar");
-  const [activeTab, setActiveTab] = useState<"calendar" | "flexible">(
-    "calendar"
-  );
-  const [stayDuration, setStayDuration] = useState<
-    "weekend" | "week" | "month" | null
-  >(null);
-  const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth());
 
   const months = [
     "January",
@@ -304,54 +420,29 @@ const DateModal = ({
 
   // Handle date selection
   const handleDateClick = (date: Date) => {
-    if (!checkIn || (checkIn && checkOut)) {
-      setCheckIn(date);
-      setCheckOut(null);
-    } else if (date > checkIn) {
-      setCheckOut(date);
+    if (!pickUp || (pickUp && dropOff)) {
+      setPickUp(date);
+      setDropOff(null);
+    } else if (date > pickUp) {
+      setDropOff(date);
     } else {
-      setCheckIn(date);
-      setCheckOut(null);
+      setPickUp(date);
+      setDropOff(null);
     }
   };
 
   // Clear selected dates
   const handleClear = () => {
-    setCheckIn(null);
-    setCheckOut(null);
-    setStayDuration(null);
+    setPickUp(null);
+    setDropOff(null);
   };
 
   // Apply selected dates
   const handleApply = () => {
-    if (activeTab === "calendar" && checkIn && checkOut) {
+    if (pickUp && dropOff) {
       onSelect(
-        checkIn.toISOString().split("T")[0],
-        checkOut.toISOString().split("T")[0]
-      );
-    } else if (
-      activeTab === "flexible" &&
-      stayDuration &&
-      selectedMonth !== null
-    ) {
-      const checkInDate = new Date(currentYear, selectedMonth, 1);
-      const checkOutDate = new Date(currentYear, selectedMonth, 1);
-
-      switch (stayDuration) {
-        case "weekend":
-          checkOutDate.setDate(checkInDate.getDate() + 2);
-          break;
-        case "week":
-          checkOutDate.setDate(checkInDate.getDate() + 7);
-          break;
-        case "month":
-          checkOutDate.setMonth(checkInDate.getMonth() + 1);
-          break;
-      }
-
-      onSelect(
-        checkInDate.toISOString().split("T")[0],
-        checkOutDate.toISOString().split("T")[0]
+        pickUp.toISOString().split("T")[0],
+        dropOff.toISOString().split("T")[0]
       );
     }
     onClose();
@@ -401,18 +492,16 @@ const DateModal = ({
     // Days from the current month
     for (let i = 1; i <= daysInMonth; i++) {
       const date = new Date(currentYear, currentMonth, i);
-      const isSelected =
-        checkIn && checkOut && date >= checkIn && date <= checkOut;
-      const isCheckIn =
-        checkIn && date.toDateString() === checkIn.toDateString();
-      const isCheckOut =
-        checkOut && date.toDateString() === checkOut.toDateString();
+      const isSelected = pickUp && dropOff && date >= pickUp && date <= dropOff;
+      const isPickUp = pickUp && date.toDateString() === pickUp.toDateString();
+      const isDropOff =
+        dropOff && date.toDateString() === dropOff.toDateString();
 
       days.push(
         <Heading6
           key={i}
           className={`w-[50px] h-[40px] text-[#222222] flex justify-center items-center cursor-pointer rounded-lg gap-0 ${
-            isCheckIn || isCheckOut
+            isPickUp || isDropOff
               ? "bg-[var(--primary)] text-white"
               : isSelected
               ? "bg-[#F9F9F9] rounded-none"
@@ -495,213 +584,50 @@ const DateModal = ({
     );
   };
 
-  const renderMonthViewFlexible = () => {
-    return (
-      <div className="grid grid-cols-3 gap-4">
-        {months.map((month, index) => (
-          <Button
-            key={month}
-            type="secondary"
-            className={cn(
-              `border hover:bg-[#E4ECEC] hover:border-[#266462] hover:text-[#266462]`,
-              selectedMonth === index
-                ? "bg-[#E4ECEC] border-[#266462] text-[#266462]"
-                : ""
-            )}
-            onClick={() => {
-              setSelectedMonth(index);
-            }}
-          >
-            {month}
-          </Button>
-        ))}
-      </div>
-    );
-  };
-
-  const renderCalendarTab = () => {
-    return (
-      <>
-        {/* Month Navigation and Selection */}
-        <div className="flex justify-between items-center mb-4">
-          {/* Previous Month Button */}
-          <Button
-            type="secondary"
-            justIcon
-            leadingIcon
-            leading="arrow-left"
-            onClick={handlePrevMonth}
-          />
-
-          {/* Select Month and Year Button */}
-          <Button type="secondary" onClick={() => setView("year")}>
-            {months[currentMonth]} {currentYear}
-          </Button>
-
-          {/* Next Month Button */}
-          <Button
-            type="secondary"
-            justIcon
-            leadingIcon
-            leading="arrow-right"
-            onClick={handleNextMonth}
-          />
-        </div>
-
-        {/* Calendar, Year, or Month View */}
-        {view === "calendar" && renderCalendar()}
-        {view === "year" && renderYearView()}
-        {view === "month" && renderMonthView()}
-      </>
-    );
-  };
-
-  // Render the Flexible tab
-  const renderFlexibleTab = () => {
-    return (
-      <div className="space-y-4">
-        {/* How long do you want to stay? */}
-        <div>
-          <h3 className="font-medium mb-2">How long do you want to stay?</h3>
-          <div className="flex flex-wrap gap-2">
-            <Button
-              type="secondary"
-              className={cn(
-                "hover:bg-[#E4ECEC] hover:border-[#266462] hover:text-[#266462]",
-                stayDuration === "weekend"
-                  ? "bg-[#E4ECEC] text-[#266462] border border-[#266462]"
-                  : ""
-              )}
-              onClick={() => setStayDuration("weekend")}
-            >
-              {stayDuration === "weekend" ? (
-                <Image
-                  src={"assets/icons/radio.svg"}
-                  alt="radio"
-                  width={16}
-                  height={16}
-                />
-              ) : (
-                <Image
-                  src={"assets/icons/radio-non.svg"}
-                  alt="radio-non"
-                  width={16}
-                  height={16}
-                />
-              )}
-              A weekend
-            </Button>
-            <Button
-              type="secondary"
-              className={cn(
-                "hover:bg-[#E4ECEC] hover:border-[#266462] hover:text-[#266462]",
-                stayDuration === "week"
-                  ? "bg-[#E4ECEC] text-[#266462] border border-[#266462]"
-                  : ""
-              )}
-              onClick={() => setStayDuration("week")}
-            >
-              {stayDuration === "week" ? (
-                <Image
-                  src={"assets/icons/radio.svg"}
-                  alt="radio"
-                  width={16}
-                  height={16}
-                />
-              ) : (
-                <Image
-                  src={"assets/icons/radio-non.svg"}
-                  alt="radio-non"
-                  width={16}
-                  height={16}
-                />
-              )}
-              A week
-            </Button>
-            <Button
-              type="secondary"
-              className={cn(
-                "hover:bg-[#E4ECEC] hover:border-[#266462] hover:text-[#266462]",
-                stayDuration === "month"
-                  ? "bg-[#E4ECEC] text-[#266462] border border-[#266462]"
-                  : ""
-              )}
-              onClick={() => setStayDuration("month")}
-            >
-              {stayDuration === "month" ? (
-                <Image
-                  src={"assets/icons/radio.svg"}
-                  alt="radio"
-                  width={16}
-                  height={16}
-                />
-              ) : (
-                <Image
-                  src={"assets/icons/radio-non.svg"}
-                  alt="radio-non"
-                  width={16}
-                  height={16}
-                />
-              )}
-              A month
-            </Button>
-          </div>
-        </div>
-
-        {/* When do you want to go? */}
-        <div>
-          <h3 className="font-medium mb-2">When do you want to go?</h3>
-          {renderMonthViewFlexible()}
-        </div>
-      </div>
-    );
-  };
-
   return (
     <>
       {/* Backdrop */}
       <div
-        className="absolute top-[80px] flex items-center justify-center z-50"
+        className={`absolute ${
+          isMobile ? "top-full mt-2 w-full" : "top-[80px] w-[388px]"
+        }`}
         onClick={onClose}
       >
         {/* Modal */}
         <div
-          className="bg-white p-4 rounded-xl w-[388px] shadow-lg"
+          className="bg-white p-4 rounded-xl shadow-lg"
           onClick={(e) => e.stopPropagation()}
         >
-          {/* Tabs */}
-          <div className="flex gap-2 mb-4">
+          {/* Month Navigation and Selection */}
+          <div className="flex justify-between items-center mb-4">
+            {/* Previous Month Button */}
             <Button
-              type={activeTab === "calendar" ? "primary" : "secondary"}
-              className={cn(
-                "flex-1",
-                activeTab === "calendar"
-                  ? "bg-[#E4ECEC] text-[var(--primary)] border border-[var(--primary)] hover:bg-[#E4ECEC]"
-                  : ""
-              )}
-              onClick={() => setActiveTab("calendar")}
-            >
-              Calendar
+              type="secondary"
+              justIcon
+              leadingIcon
+              leading="arrow-left"
+              onClick={handlePrevMonth}
+            />
+
+            {/* Select Month and Year Button */}
+            <Button type="secondary" onClick={() => setView("year")}>
+              {months[currentMonth]} {currentYear}
             </Button>
+
+            {/* Next Month Button */}
             <Button
-              type={activeTab === "flexible" ? "primary" : "secondary"}
-              className={cn(
-                "flex-1",
-                activeTab === "flexible"
-                  ? "bg-[#E4ECEC] text-[var(--primary)] border border-[var(--primary)] hover:bg-[#E4ECEC]"
-                  : ""
-              )}
-              onClick={() => setActiveTab("flexible")}
-            >
-              Flexible
-            </Button>
+              type="secondary"
+              justIcon
+              leadingIcon
+              leading="arrow-right"
+              onClick={handleNextMonth}
+            />
           </div>
 
-          {/* Calendar Tab */}
-          {activeTab === "calendar" && renderCalendarTab()}
-
-          {/* Flexible Tab */}
-          {activeTab === "flexible" && renderFlexibleTab()}
+          {/* Calendar, Year, or Month View */}
+          {view === "calendar" && renderCalendar()}
+          {view === "year" && renderYearView()}
+          {view === "month" && renderMonthView()}
 
           {/* Action Buttons */}
           <div className="flex justify-end gap-2 mt-4">
@@ -719,31 +645,64 @@ const DateModal = ({
 };
 
 const CarModal = ({
+  isMobile,
   onClose,
   onSelect,
 }: {
+  isMobile: boolean;
   onClose: () => void;
   onSelect: (carModel: string) => void;
 }) => {
-  const handleBackdropClick = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (e.target === e.currentTarget) {
-      onClose();
-      onSelect("BMW");
-    }
+  const carModels = [
+    "Economy",
+    "Compact",
+    "Mid-size",
+    "Full-size",
+    "SUV",
+    "Luxury",
+    "Convertible",
+    "Minivan",
+  ];
+
+  const handleSelectCar = (model: string) => {
+    onSelect(model);
+    onClose();
   };
 
   return (
     <>
       {/* Backdrop */}
       <div
-        className="fixed inset-0 flex items-center justify-center z-10"
-        onClick={handleBackdropClick}
+        className={`absolute ${
+          isMobile ? "top-full mt-2 w-full" : "top-[80px] right-[50px] w-94"
+        }`}
+        onClick={onClose}
       />
       {/* Modal */}
       <div
-        className="absolute z-20 top-[80px] right-[50px] bg-white p-4 w-94 rounded-lg"
+        className="absolute z-20 top-[80px] right-[50px] bg-white p-4 w-94 rounded-lg shadow-lg"
         onClick={(e) => e.stopPropagation()}
-      ></div>
+      >
+        <Title1 className="text-black mb-6">Select Car Model</Title1>
+        <div className="grid grid-cols-2 gap-4">
+          {carModels.map((model) => (
+            <Button
+              key={model}
+              type="secondary"
+              className="flex items-center justify-center gap-2 p-3"
+              onClick={() => handleSelectCar(model)}
+            >
+              <Image
+                src={"/assets/icons/car.svg"}
+                alt={"car"}
+                width={24}
+                height={24}
+              />
+              {model}
+            </Button>
+          ))}
+        </div>
+      </div>
     </>
   );
 };

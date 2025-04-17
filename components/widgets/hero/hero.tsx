@@ -14,7 +14,7 @@ const Hero = ({
 }) => {
   return (
     <div
-      className="relative z-2 w-full h-screen flex items-center justify-center bg-cover bg-center pt-[80px] md:pt-[128px] pb-[40px]"
+      className="relative z-2 w-full min-h-screen flex items-center justify-center bg-cover bg-center pt-[80px] md:pt-[128px] pb-[40px]"
       style={{
         backgroundImage: `url('/assets/backgrounds/${background_image}.jpg')`,
       }}

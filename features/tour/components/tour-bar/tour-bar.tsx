@@ -1,46 +1,58 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Image from "next/image";
 import { Heading6, Title1, Title2 } from "@/components/common";
 import { Button } from "@/components/ui";
 import { cn } from "@/core/lib/utils";
+import { useRouter } from "next/navigation";
 
 const TourSearchBar = () => {
   const [isFromModalOpen, setIsFromModalOpen] = useState(false);
   const [isDateModalOpen, setIsDateModalOpen] = useState(false);
   const [isGuestsModalOpen, setIsGuestsModalOpen] = useState(false);
+  const [windowWidth, setWindowWidth] = useState(0);
 
   const [fromDestination, setFromDestination] = useState("");
   const [checkInDate, setCheckInDate] = useState("");
   const [checkOutDate, setCheckOutDate] = useState("");
-  const [guests, setGuests] = useState<{
-    adults: number;
-    children: number;
-    infants: number;
-    pets: number;
-  }>({ adults: 0, children: 0, infants: 0, pets: 0 });
+  const [guests, setGuests] = useState({
+    adults: 1,
+    children: 0,
+    infants: 0,
+    pets: 0,
+  });
 
-  // const openFromModal = () => setIsFromModalOpen(true);
-  const openDateModal = () => setIsDateModalOpen(true);
-  const openGuestsModal = () => setIsGuestsModalOpen(true);
+  const router = useRouter();
+  const isMobile = windowWidth <= 768;
+
+  useEffect(() => {
+    const handleResize = () => {
+      setWindowWidth(window.innerWidth);
+    };
+
+    setWindowWidth(window.innerWidth);
+    window.addEventListener("resize", handleResize);
+
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
   const toggleFromModal = () => {
     setIsFromModalOpen(!isFromModalOpen);
-    closeDateModal();
-    closeGuestsModal();
+    setIsDateModalOpen(false);
+    setIsGuestsModalOpen(false);
   };
 
   const toggleDateModal = () => {
     setIsDateModalOpen(!isDateModalOpen);
-    closeFromModal();
-    closeGuestsModal();
+    setIsFromModalOpen(false);
+    setIsGuestsModalOpen(false);
   };
 
   const toggleGuestsModal = () => {
     setIsGuestsModalOpen(!isGuestsModalOpen);
-    closeFromModal();
-    closeDateModal();
+    setIsFromModalOpen(false);
+    setIsDateModalOpen(false);
   };
 
   const closeFromModal = () => setIsFromModalOpen(false);
@@ -50,14 +62,14 @@ const TourSearchBar = () => {
   const handleFromDestinationSelect = (destination: string) => {
     setFromDestination(destination);
     closeFromModal();
-    openDateModal();
+    if (!isMobile) toggleDateModal();
   };
 
   const handleDateSelect = (checkIn: string, checkOut: string) => {
     setCheckInDate(checkIn);
     setCheckOutDate(checkOut);
     closeDateModal();
-    openGuestsModal();
+    if (!isMobile) toggleGuestsModal();
   };
 
   const handleGuestsSelect = (guests: {
@@ -66,126 +78,230 @@ const TourSearchBar = () => {
     infants: number;
     pets: number;
   }) => {
-    setGuests(guests); // Update the guests state
-    console.log("Selected Guests:", guests);
+    setGuests(guests);
+  };
+
+  const handleSearchSubmit = () => {
+    const queryParams = new URLSearchParams();
+    if (fromDestination) queryParams.append("destination", fromDestination);
+    if (checkInDate) queryParams.append("checkIn", checkInDate);
+    if (checkOutDate) queryParams.append("checkOut", checkOutDate);
+    queryParams.append("adults", guests.adults.toString());
+    queryParams.append("children", guests.children.toString());
+    queryParams.append("infants", guests.infants.toString());
+    queryParams.append("pets", guests.pets.toString());
+
+    router.push(`/tours/search?${queryParams.toString()}`);
   };
 
   return (
     <div className="w-full py-4">
-      <div className="flex w-full items-center justify-between gap-4">
-        {/* From Destination Button */}
-        <div className="relative flex-1 z-43">
-          <div
-            className="flex items-center gap-2 rounded-full cursor-pointer transition-all duration-300 hover:bg-gray-100"
-            onClick={toggleFromModal}
-          >
-            <Image
-              src={"/assets/icons/location.svg"}
-              alt={"location"}
-              width={44}
-              height={44}
-              className="bg-[#F9F9F9] rounded-full p-2"
-            />
-            <div className="flex flex-col">
-              <Heading6 className="text-[#ADADAD]">Where</Heading6>
-              <Heading6 className="text-[#4C4C4C]">
-                {fromDestination || "Select destination"}
-              </Heading6>
+      {/* Mobile: Vertical Layout */}
+      {isMobile ? (
+        <div className="flex flex-col gap-4">
+          {/* Destination */}
+          <div className="relative z-43">
+            <div
+              className="flex items-center gap-2 rounded-full cursor-pointer transition-all duration-300 hover:bg-gray-100 p-3"
+              onClick={toggleFromModal}
+            >
+              <Image
+                src={"/assets/icons/location.svg"}
+                alt={"location"}
+                width={44}
+                height={44}
+                className="bg-[#F9F9F9] rounded-full p-2"
+              />
+              <div className="flex flex-col">
+                <Heading6 className="text-[#ADADAD]">Where</Heading6>
+                <Heading6 className="text-[#4C4C4C]">
+                  {fromDestination || "Select destination"}
+                </Heading6>
+              </div>
             </div>
           </div>
 
-          {isFromModalOpen && (
-            <Modal
-              title="Select From Destination"
-              onClose={closeFromModal}
-              onSelect={handleFromDestinationSelect}
-            />
-          )}
-        </div>
-
-        {/* Date Check-in/Check-out Button */}
-        <div className="relative flex-1 z-42">
-          <div
-            className="relative z-44 flex items-center gap-2 rounded-full cursor-pointer transition-all duration-300 hover:bg-gray-100"
-            onClick={toggleDateModal}
-          >
-            <Image
-              src={"/assets/icons/calendar.svg"}
-              alt={"calendar"}
-              width={44}
-              height={44}
-              className="bg-[#F9F9F9] rounded-full p-2"
-            />
-            <div className="flex flex-col">
-              <Heading6 className="text-[#ADADAD]">Tour Date/Time</Heading6>
-              <Heading6 className="text-[#4C4C4C]">
-                {checkInDate && checkOutDate
-                  ? `${checkInDate} - ${checkOutDate}`
-                  : "Add dates"}
-              </Heading6>
+          {/* Dates */}
+          <div className="relative z-42">
+            <div
+              className="flex items-center gap-2 rounded-full cursor-pointer transition-all duration-300 hover:bg-gray-100 p-3"
+              onClick={toggleDateModal}
+            >
+              <Image
+                src={"/assets/icons/calendar.svg"}
+                alt={"calendar"}
+                width={44}
+                height={44}
+                className="bg-[#F9F9F9] rounded-full p-2"
+              />
+              <div className="flex flex-col">
+                <Heading6 className="text-[#ADADAD]">Tour Date/Time</Heading6>
+                <Heading6 className="text-[#4C4C4C]">
+                  {checkInDate && checkOutDate
+                    ? `${checkInDate} - ${checkOutDate}`
+                    : "Add dates"}
+                </Heading6>
+              </div>
             </div>
           </div>
 
-          {isDateModalOpen && (
-            <DateModal
-              title="Select Dates"
-              onClose={closeDateModal}
-              onSelect={handleDateSelect}
-            />
-          )}
-        </div>
-
-        {/* Add Guests Button */}
-        <div className="relative flex-1 z-42">
-          <div
-            className="relative z-42 flex items-center gap-2 rounded-full cursor-pointer transition-all duration-300 hover:bg-gray-100"
-            onClick={toggleGuestsModal}
-          >
-            <Image
-              src={"/assets/icons/user.svg"}
-              alt={"user"}
-              width={44}
-              height={44}
-              className="bg-[#F9F9F9] rounded-full p-2"
-            />
-            <div className="flex flex-col">
-              <Heading6 className="text-[#ADADAD]">Who</Heading6>
-              <Heading6 className="text-[#4C4C4C]">
-                {guests.adults + guests.children > 0
-                  ? `${guests.adults + guests.children} guests`
-                  : "Add guests"}
-              </Heading6>
+          {/* Guests */}
+          <div className="relative z-42">
+            <div
+              className="flex items-center gap-2 rounded-full cursor-pointer transition-all duration-300 hover:bg-gray-100 p-3"
+              onClick={toggleGuestsModal}
+            >
+              <Image
+                src={"/assets/icons/user.svg"}
+                alt={"user"}
+                width={44}
+                height={44}
+                className="bg-[#F9F9F9] rounded-full p-2"
+              />
+              <div className="flex flex-col">
+                <Heading6 className="text-[#ADADAD]">Who</Heading6>
+                <Heading6 className="text-[#4C4C4C]">
+                  {guests.adults + guests.children > 0
+                    ? `${guests.adults + guests.children} guests`
+                    : "Add guests"}
+                </Heading6>
+              </div>
             </div>
           </div>
 
-          {isGuestsModalOpen && (
-            <GuestsModal
-              onClose={closeGuestsModal}
-              onSelect={handleGuestsSelect}
-              initialGuests={guests}
-            />
-          )}
+          {/* Search Button */}
+          <Button
+            type="primary"
+            className="w-full py-3"
+            onClick={handleSearchSubmit}
+          >
+            Search Tours
+          </Button>
         </div>
+      ) : (
+        /* Desktop: Horizontal Layout */
+        <div className="flex w-full items-center justify-between gap-4">
+          {/* Destination */}
+          <div className="relative flex-1 z-43">
+            <div
+              className="flex items-center gap-2 rounded-full cursor-pointer transition-all duration-300 hover:bg-gray-100"
+              onClick={toggleFromModal}
+            >
+              <Image
+                src={"/assets/icons/location.svg"}
+                alt={"location"}
+                width={44}
+                height={44}
+                className="bg-[#F9F9F9] rounded-full p-2"
+              />
+              <div className="flex flex-col">
+                <Heading6 className="text-[#ADADAD]">Where</Heading6>
+                <Heading6 className="text-[#4C4C4C]">
+                  {fromDestination || "Select destination"}
+                </Heading6>
+              </div>
+            </div>
+          </div>
 
-        {/* Search Button */}
-        <Button
-          type="tertiary"
-          justIcon
-          leadingIcon
-          leading="magnifer"
-          className="h-[56px] w-[56px] p-[12px]"
+          {/* Dates */}
+          <div className="relative flex-1 z-42">
+            <div
+              className="flex items-center gap-2 rounded-full cursor-pointer transition-all duration-300 hover:bg-gray-100"
+              onClick={toggleDateModal}
+            >
+              <Image
+                src={"/assets/icons/calendar.svg"}
+                alt={"calendar"}
+                width={44}
+                height={44}
+                className="bg-[#F9F9F9] rounded-full p-2"
+              />
+              <div className="flex flex-col">
+                <Heading6 className="text-[#ADADAD]">Tour Date/Time</Heading6>
+                <Heading6 className="text-[#4C4C4C]">
+                  {checkInDate && checkOutDate
+                    ? `${checkInDate} - ${checkOutDate}`
+                    : "Add dates"}
+                </Heading6>
+              </div>
+            </div>
+          </div>
+
+          {/* Guests */}
+          <div className="relative flex-1 z-42">
+            <div
+              className="flex items-center gap-2 rounded-full cursor-pointer transition-all duration-300 hover:bg-gray-100"
+              onClick={toggleGuestsModal}
+            >
+              <Image
+                src={"/assets/icons/user.svg"}
+                alt={"user"}
+                width={44}
+                height={44}
+                className="bg-[#F9F9F9] rounded-full p-2"
+              />
+              <div className="flex flex-col">
+                <Heading6 className="text-[#ADADAD]">Who</Heading6>
+                <Heading6 className="text-[#4C4C4C]">
+                  {guests.adults + guests.children > 0
+                    ? `${guests.adults + guests.children} guests`
+                    : "Add guests"}
+                </Heading6>
+              </div>
+            </div>
+          </div>
+
+          {/* Search Button */}
+          <Button
+            type="tertiary"
+            justIcon
+            leadingIcon
+            leading="magnifer"
+            className="h-[56px] w-[56px] p-[12px]"
+            onClick={handleSearchSubmit}
+          />
+        </div>
+      )}
+
+      {/* Modals */}
+      {isFromModalOpen && (
+        <Modal
+          title="Select Destination"
+          onClose={closeFromModal}
+          onSelect={handleFromDestinationSelect}
+          isMobile={isMobile}
         />
-      </div>
+      )}
+
+      {isDateModalOpen && (
+        <DateModal
+          title="Select Dates"
+          onClose={closeDateModal}
+          onSelect={handleDateSelect}
+          isMobile={isMobile}
+        />
+      )}
+
+      {isGuestsModalOpen && (
+        <GuestsModal
+          onClose={closeGuestsModal}
+          onSelect={handleGuestsSelect}
+          initialGuests={guests}
+          isMobile={isMobile}
+        />
+      )}
     </div>
   );
 };
 
 // Destination Modal Component
 const Modal = ({
+  isMobile,
   onClose,
   onSelect,
 }: {
   title: string;
+  isMobile: boolean;
   onClose: () => void;
   onSelect: (value: string) => void;
 }) => {
@@ -194,11 +310,11 @@ const Modal = ({
 
   // Suggested destinations
   const destinations = [
-    { name: "Tbilisi, Georgia", description: "Family Friendly" },
-    { name: "Baku, Azerbaijan", description: "For night life" },
-    { name: "Istanbul, Turkey", description: "Popular beach placing" },
-    { name: "Batumi, Georgia", description: "For muslim people" },
-    { name: "London, UK", description: "For architecture" },
+    { name: "Tbilisi, Georgia", description: "Cultural Tours" },
+    { name: "Baku, Azerbaijan", description: "City Tours" },
+    { name: "Istanbul, Turkey", description: "Historical Tours" },
+    { name: "Batumi, Georgia", description: "Coastal Tours" },
+    { name: "London, UK", description: "Sightseeing Tours" },
   ];
 
   // Filter destinations based on search query
@@ -209,20 +325,24 @@ const Modal = ({
   // Handle destination selection
   const handleSelectDestination = (destination: string) => {
     setSelectedDestination(destination);
-    onSelect(destination); // Pass the selected destination to the parent
-    onClose(); // Close the modal after selection
+    onSelect(destination);
+    onClose();
   };
 
   // Handle Enter key press
   const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter") {
-      onClose(); // Close the modal on Enter
+      onClose();
     }
   };
 
   return (
-    <div className="absolute top-[80px] flex items-center justify-center">
-      <div className="bg-white p-4 rounded-lg w-[388px] shadow-lg">
+    <div
+      className={`absolute ${
+        isMobile ? "top-full mt-2 w-full" : "top-[80px] w-[388px]"
+      }`}
+    >
+      <div className="bg-white p-4 rounded-lg shadow-lg">
         {/* Search Input */}
         <input
           type="text"
@@ -233,13 +353,16 @@ const Modal = ({
           onKeyDown={handleKeyPress}
         />
 
-        <Title1 className="text-black mb-6">Suggested destinations</Title1>
+        {!searchQuery && (
+          <Title1 className="text-black mb-6">Popular Tour Destinations</Title1>
+        )}
+
         {/* Suggested Destinations */}
         <div className="space-y-3">
           {filteredDestinations.map((destination, index) => (
             <div
               key={index}
-              className="flex items-center justify-start gap-2 rounded-full hover:bg-gray-100 rounded cursor-pointer"
+              className="flex items-center justify-start gap-2 rounded-full hover:bg-gray-100 cursor-pointer p-2"
               onClick={() => handleSelectDestination(destination.name)}
             >
               <Image
@@ -264,10 +387,12 @@ const Modal = ({
 };
 
 const DateModal = ({
+  isMobile,
   onClose,
   onSelect,
 }: {
   title: string;
+  isMobile: boolean;
   onClose: () => void;
   onSelect: (checkIn: string, checkOut: string) => void;
 }) => {
@@ -576,7 +701,7 @@ const DateModal = ({
       <div className="space-y-4">
         {/* How long do you want to stay? */}
         <div>
-          <h3 className="font-medium mb-2">How long do you want to stay?</h3>
+          <h3 className="font-medium mb-2">Tour Duration</h3>
           <div className="flex flex-wrap gap-2">
             <Button
               type="secondary"
@@ -603,7 +728,7 @@ const DateModal = ({
                   height={16}
                 />
               )}
-              A weekend
+              Weekend Tour
             </Button>
             <Button
               type="secondary"
@@ -630,7 +755,7 @@ const DateModal = ({
                   height={16}
                 />
               )}
-              A week
+              Week-long Tour
             </Button>
             <Button
               type="secondary"
@@ -657,7 +782,7 @@ const DateModal = ({
                   height={16}
                 />
               )}
-              A month
+              Extended Tour
             </Button>
           </div>
         </div>
@@ -675,12 +800,14 @@ const DateModal = ({
     <>
       {/* Backdrop */}
       <div
-        className="absolute top-[80px] flex items-center justify-center z-50"
+        className={`absolute ${
+          isMobile ? "top-full mt-2 w-full" : "top-[80px] w-[388px]"
+        }`}
         onClick={onClose}
       >
         {/* Modal */}
         <div
-          className="bg-white p-4 rounded-xl w-[388px] shadow-lg"
+          className="bg-white p-4 rounded-xl shadow-lg"
           onClick={(e) => e.stopPropagation()}
         >
           {/* Tabs */}
@@ -733,10 +860,18 @@ const DateModal = ({
 };
 
 const GuestsModal = ({
+  initialGuests,
+  isMobile,
   onClose,
   onSelect,
-  initialGuests,
 }: {
+  initialGuests: {
+    adults: number;
+    children: number;
+    infants: number;
+    pets: number;
+  };
+  isMobile: boolean;
   onClose: () => void;
   onSelect: (count: {
     adults: number;
@@ -744,12 +879,6 @@ const GuestsModal = ({
     infants: number;
     pets: number;
   }) => void;
-  initialGuests: {
-    adults: number;
-    children: number;
-    infants: number;
-    pets: number;
-  };
 }) => {
   const [adults, setAdults] = useState(initialGuests.adults);
   const [children, setChildren] = useState(initialGuests.children);
@@ -800,7 +929,7 @@ const GuestsModal = ({
 
     switch (category) {
       case "adults":
-        updatedAdults = Math.max(0, adults - 1);
+        updatedAdults = Math.max(1, adults - 1); // At least 1 adult
         setAdults(updatedAdults);
         break;
       case "children":
@@ -838,12 +967,14 @@ const GuestsModal = ({
     <>
       {/* Backdrop */}
       <div
-        className="fixed inset-0 flex items-center justify-center z-10"
+        className={`absolute ${
+          isMobile ? "top-full mt-2 w-full" : "top-[80px] right-[50px] w-94"
+        }`}
         onClick={handleBackdropClick}
       />
       {/* Modal */}
       <div
-        className="absolute z-20 top-[80px] right-[50px] bg-white p-4 w-94 rounded-lg"
+        className="absolute z-20 top-[80px] right-[50px] bg-white p-4 w-94 rounded-lg shadow-lg"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Adults Counter */}

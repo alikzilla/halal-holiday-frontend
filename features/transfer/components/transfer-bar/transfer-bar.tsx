@@ -1,59 +1,70 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Image from "next/image";
 import { Heading6, Title1, Title2 } from "@/components/common";
 import { Button } from "@/components/ui";
 import { cn } from "@/core/lib/utils";
+import { useRouter } from "next/navigation";
 
 const TransferSearchBar = () => {
   const [isFromModalOpen, setIsFromModalOpen] = useState(false);
   const [isToModalOpen, setIsToModalOpen] = useState(false);
   const [isDateModalOpen, setIsDateModalOpen] = useState(false);
   const [isGuestsModalOpen, setIsGuestsModalOpen] = useState(false);
+  const [windowWidth, setWindowWidth] = useState(0);
 
   const [fromDestination, setFromDestination] = useState("");
   const [toDestination, setToDestination] = useState("");
   const [checkInDate, setCheckInDate] = useState("");
   const [checkOutDate, setCheckOutDate] = useState("");
-  const [guests, setGuests] = useState<{
-    adults: number;
-    children: number;
-    infants: number;
-    pets: number;
-  }>({ adults: 0, children: 0, infants: 0, pets: 0 });
+  const [guests, setGuests] = useState({
+    adults: 1,
+    children: 0,
+    infants: 0,
+    pets: 0,
+  });
 
-  // const openFromModal = () => setIsFromModalOpen(true);
-  const openToModal = () => setIsToModalOpen(true);
-  const openDateModal = () => setIsDateModalOpen(true);
-  const openGuestsModal = () => setIsGuestsModalOpen(true);
+  const router = useRouter();
+  const isMobile = windowWidth <= 768;
+
+  useEffect(() => {
+    const handleResize = () => {
+      setWindowWidth(window.innerWidth);
+    };
+
+    setWindowWidth(window.innerWidth);
+    window.addEventListener("resize", handleResize);
+
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
   const toggleFromModal = () => {
     setIsFromModalOpen(!isFromModalOpen);
-    closeToModal();
-    closeDateModal();
-    closeGuestsModal();
+    setIsToModalOpen(false);
+    setIsDateModalOpen(false);
+    setIsGuestsModalOpen(false);
   };
 
   const toggleToModal = () => {
     setIsToModalOpen(!isToModalOpen);
-    closeFromModal();
-    closeDateModal();
-    closeGuestsModal();
+    setIsFromModalOpen(false);
+    setIsDateModalOpen(false);
+    setIsGuestsModalOpen(false);
   };
 
   const toggleDateModal = () => {
     setIsDateModalOpen(!isDateModalOpen);
-    closeFromModal();
-    closeToModal();
-    closeGuestsModal();
+    setIsFromModalOpen(false);
+    setIsToModalOpen(false);
+    setIsGuestsModalOpen(false);
   };
 
   const toggleGuestsModal = () => {
     setIsGuestsModalOpen(!isGuestsModalOpen);
-    closeFromModal();
-    closeToModal();
-    closeDateModal();
+    setIsFromModalOpen(false);
+    setIsToModalOpen(false);
+    setIsDateModalOpen(false);
   };
 
   const closeFromModal = () => setIsFromModalOpen(false);
@@ -64,20 +75,20 @@ const TransferSearchBar = () => {
   const handleFromDestinationSelect = (destination: string) => {
     setFromDestination(destination);
     closeFromModal();
-    openToModal();
+    if (!isMobile) toggleToModal();
   };
 
   const handleToDestinationSelect = (destination: string) => {
     setToDestination(destination);
     closeToModal();
-    openDateModal();
+    if (!isMobile) toggleDateModal();
   };
 
   const handleDateSelect = (checkIn: string, checkOut: string) => {
     setCheckInDate(checkIn);
     setCheckOutDate(checkOut);
     closeDateModal();
-    openGuestsModal();
+    if (!isMobile) toggleGuestsModal();
   };
 
   const handleGuestsSelect = (guests: {
@@ -86,158 +97,280 @@ const TransferSearchBar = () => {
     infants: number;
     pets: number;
   }) => {
-    setGuests(guests); // Update the guests state
-    console.log("Selected Guests:", guests);
+    setGuests(guests);
+  };
+
+  const handleSearchSubmit = () => {
+    const queryParams = new URLSearchParams();
+    if (fromDestination) queryParams.append("from", fromDestination);
+    if (toDestination) queryParams.append("to", toDestination);
+    if (checkInDate) queryParams.append("date", checkInDate);
+    queryParams.append("adults", guests.adults.toString());
+    queryParams.append("children", guests.children.toString());
+    queryParams.append("infants", guests.infants.toString());
+    queryParams.append("pets", guests.pets.toString());
+
+    router.push(`/transfers/search?${queryParams.toString()}`);
   };
 
   return (
     <div className="w-full py-4">
-      <div className="flex w-full items-center justify-between gap-4">
-        {/* From Destination Button */}
-        <div className="relative flex-1 z-43">
-          <div
-            className="flex items-center gap-2 rounded-full cursor-pointer transition-all duration-300 hover:bg-gray-100"
-            onClick={toggleFromModal}
-          >
-            <Image
-              src={"/assets/icons/location.svg"}
-              alt={"location"}
-              width={44}
-              height={44}
-              className="bg-[#F9F9F9] rounded-full p-2"
-            />
-            <div className="flex flex-col">
-              <Heading6 className="text-[#ADADAD]">From</Heading6>
-              <Heading6 className="text-[#4C4C4C]">
-                {fromDestination || "Select destination"}
-              </Heading6>
+      {/* Mobile: Vertical Layout */}
+      {isMobile ? (
+        <div className="flex flex-col gap-4">
+          {/* From Destination */}
+          <div className="relative z-43">
+            <div
+              className="flex items-center gap-2 rounded-full cursor-pointer transition-all duration-300 hover:bg-gray-100 p-3"
+              onClick={toggleFromModal}
+            >
+              <Image
+                src={"/assets/icons/location.svg"}
+                alt={"location"}
+                width={44}
+                height={44}
+                className="bg-[#F9F9F9] rounded-full p-2"
+              />
+              <div className="flex flex-col">
+                <Heading6 className="text-[#ADADAD]">From</Heading6>
+                <Heading6 className="text-[#4C4C4C]">
+                  {fromDestination || "Pick-up location"}
+                </Heading6>
+              </div>
             </div>
           </div>
 
-          {isFromModalOpen && (
-            <Modal
-              title="Select From Destination"
-              onClose={closeFromModal}
-              onSelect={handleFromDestinationSelect}
-            />
-          )}
-        </div>
-
-        {/* To Destination Button */}
-        <div className="relative flex-1 z-43">
-          <div
-            className="flex items-center gap-2 rounded-full cursor-pointer transition-all duration-300 hover:bg-gray-100"
-            onClick={toggleToModal}
-          >
-            <Image
-              src={"/assets/icons/location.svg"}
-              alt={"location"}
-              width={44}
-              height={44}
-              className="bg-[#F9F9F9] rounded-full p-2"
-            />
-            <div className="flex flex-col">
-              <Heading6 className="text-[#ADADAD]">To</Heading6>
-              <Heading6 className="text-[#4C4C4C]">
-                {toDestination || "Select destination"}
-              </Heading6>
+          {/* To Destination */}
+          <div className="relative z-43">
+            <div
+              className="flex items-center gap-2 rounded-full cursor-pointer transition-all duration-300 hover:bg-gray-100 p-3"
+              onClick={toggleToModal}
+            >
+              <Image
+                src={"/assets/icons/location.svg"}
+                alt={"location"}
+                width={44}
+                height={44}
+                className="bg-[#F9F9F9] rounded-full p-2"
+              />
+              <div className="flex flex-col">
+                <Heading6 className="text-[#ADADAD]">To</Heading6>
+                <Heading6 className="text-[#4C4C4C]">
+                  {toDestination || "Drop-off location"}
+                </Heading6>
+              </div>
             </div>
           </div>
 
-          {isToModalOpen && (
-            <Modal
-              title="Select To Destination"
-              onClose={closeToModal}
-              onSelect={handleToDestinationSelect}
-            />
-          )}
-        </div>
-
-        {/* Date Check-in/Check-out Button */}
-        <div className="relative flex-1 z-42">
-          <div
-            className="relative z-44 flex items-center gap-2 rounded-full cursor-pointer transition-all duration-300 hover:bg-gray-100"
-            onClick={toggleDateModal}
-          >
-            <Image
-              src={"/assets/icons/calendar.svg"}
-              alt={"calendar"}
-              width={44}
-              height={44}
-              className="bg-[#F9F9F9] rounded-full p-2"
-            />
-            <div className="flex flex-col">
-              <Heading6 className="text-[#ADADAD]">
-                Check in / Check out
-              </Heading6>
-              <Heading6 className="text-[#4C4C4C]">
-                {checkInDate && checkOutDate
-                  ? `${checkInDate} - ${checkOutDate}`
-                  : "Select dates"}
-              </Heading6>
+          {/* Date */}
+          <div className="relative z-42">
+            <div
+              className="flex items-center gap-2 rounded-full cursor-pointer transition-all duration-300 hover:bg-gray-100 p-3"
+              onClick={toggleDateModal}
+            >
+              <Image
+                src={"/assets/icons/calendar.svg"}
+                alt={"calendar"}
+                width={44}
+                height={44}
+                className="bg-[#F9F9F9] rounded-full p-2"
+              />
+              <div className="flex flex-col">
+                <Heading6 className="text-[#ADADAD]">Date/Time</Heading6>
+                <Heading6 className="text-[#4C4C4C]">
+                  {checkInDate || "Add date"}
+                </Heading6>
+              </div>
             </div>
           </div>
 
-          {isDateModalOpen && (
-            <DateModal
-              title="Select Dates"
-              onClose={closeDateModal}
-              onSelect={handleDateSelect}
-            />
-          )}
-        </div>
-
-        {/* Add Guests Button */}
-        <div className="relative flex-1 z-42">
-          <div
-            className="relative z-42 flex items-center gap-2 rounded-full cursor-pointer transition-all duration-300 hover:bg-gray-100"
-            onClick={toggleGuestsModal}
-          >
-            <Image
-              src={"/assets/icons/user.svg"}
-              alt={"user"}
-              width={44}
-              height={44}
-              className="bg-[#F9F9F9] rounded-full p-2"
-            />
-            <div className="flex flex-col">
-              <Heading6 className="text-[#ADADAD]">Who</Heading6>
-              <Heading6 className="text-[#4C4C4C]">
-                {guests.adults + guests.children > 0
-                  ? `${guests.adults + guests.children} guests`
-                  : "Add guests"}
-              </Heading6>
+          {/* Guests */}
+          <div className="relative z-42">
+            <div
+              className="flex items-center gap-2 rounded-full cursor-pointer transition-all duration-300 hover:bg-gray-100 p-3"
+              onClick={toggleGuestsModal}
+            >
+              <Image
+                src={"/assets/icons/user.svg"}
+                alt={"user"}
+                width={44}
+                height={44}
+                className="bg-[#F9F9F9] rounded-full p-2"
+              />
+              <div className="flex flex-col">
+                <Heading6 className="text-[#ADADAD]">Passengers</Heading6>
+                <Heading6 className="text-[#4C4C4C]">
+                  {guests.adults + guests.children > 0
+                    ? `${guests.adults + guests.children} passengers`
+                    : "Add passengers"}
+                </Heading6>
+              </div>
             </div>
           </div>
 
-          {isGuestsModalOpen && (
-            <GuestsModal
-              onClose={closeGuestsModal}
-              onSelect={handleGuestsSelect}
-              initialGuests={guests}
-            />
-          )}
+          {/* Search Button */}
+          <Button
+            type="primary"
+            className="w-full py-3"
+            onClick={handleSearchSubmit}
+          >
+            Search Transfers
+          </Button>
         </div>
+      ) : (
+        /* Desktop: Horizontal Layout */
+        <div className="flex w-full items-center justify-between gap-4">
+          {/* From Destination */}
+          <div className="relative flex-1 z-43">
+            <div
+              className="flex items-center gap-2 rounded-full cursor-pointer transition-all duration-300 hover:bg-gray-100"
+              onClick={toggleFromModal}
+            >
+              <Image
+                src={"/assets/icons/location.svg"}
+                alt={"location"}
+                width={44}
+                height={44}
+                className="bg-[#F9F9F9] rounded-full p-2"
+              />
+              <div className="flex flex-col">
+                <Heading6 className="text-[#ADADAD]">From</Heading6>
+                <Heading6 className="text-[#4C4C4C]">
+                  {fromDestination || "Pick-up location"}
+                </Heading6>
+              </div>
+            </div>
+          </div>
 
-        {/* Search Button */}
-        <Button
-          type="tertiary"
-          justIcon
-          leadingIcon
-          leading="magnifer"
-          className="h-[56px] w-[56px] p-[12px]"
+          {/* To Destination */}
+          <div className="relative flex-1 z-43">
+            <div
+              className="flex items-center gap-2 rounded-full cursor-pointer transition-all duration-300 hover:bg-gray-100"
+              onClick={toggleToModal}
+            >
+              <Image
+                src={"/assets/icons/location.svg"}
+                alt={"location"}
+                width={44}
+                height={44}
+                className="bg-[#F9F9F9] rounded-full p-2"
+              />
+              <div className="flex flex-col">
+                <Heading6 className="text-[#ADADAD]">To</Heading6>
+                <Heading6 className="text-[#4C4C4C]">
+                  {toDestination || "Drop-off location"}
+                </Heading6>
+              </div>
+            </div>
+          </div>
+
+          {/* Date */}
+          <div className="relative flex-1 z-42">
+            <div
+              className="flex items-center gap-2 rounded-full cursor-pointer transition-all duration-300 hover:bg-gray-100"
+              onClick={toggleDateModal}
+            >
+              <Image
+                src={"/assets/icons/calendar.svg"}
+                alt={"calendar"}
+                width={44}
+                height={44}
+                className="bg-[#F9F9F9] rounded-full p-2"
+              />
+              <div className="flex flex-col">
+                <Heading6 className="text-[#ADADAD]">Date/Time</Heading6>
+                <Heading6 className="text-[#4C4C4C]">
+                  {checkInDate || "Add date"}
+                </Heading6>
+              </div>
+            </div>
+          </div>
+
+          {/* Guests */}
+          <div className="relative flex-1 z-42">
+            <div
+              className="flex items-center gap-2 rounded-full cursor-pointer transition-all duration-300 hover:bg-gray-100"
+              onClick={toggleGuestsModal}
+            >
+              <Image
+                src={"/assets/icons/user.svg"}
+                alt={"user"}
+                width={44}
+                height={44}
+                className="bg-[#F9F9F9] rounded-full p-2"
+              />
+              <div className="flex flex-col">
+                <Heading6 className="text-[#ADADAD]">Passengers</Heading6>
+                <Heading6 className="text-[#4C4C4C]">
+                  {guests.adults + guests.children > 0
+                    ? `${guests.adults + guests.children} passengers`
+                    : "Add passengers"}
+                </Heading6>
+              </div>
+            </div>
+          </div>
+
+          {/* Search Button */}
+          <Button
+            type="tertiary"
+            justIcon
+            leadingIcon
+            leading="magnifer"
+            className="h-[56px] w-[56px] p-[12px]"
+            onClick={handleSearchSubmit}
+          />
+        </div>
+      )}
+
+      {/* Modals */}
+      {isFromModalOpen && (
+        <Modal
+          title="Pick-up Location"
+          onClose={closeFromModal}
+          onSelect={handleFromDestinationSelect}
+          isMobile={isMobile}
         />
-      </div>
+      )}
+
+      {isToModalOpen && (
+        <Modal
+          title="Drop-off Location"
+          onClose={closeToModal}
+          onSelect={handleToDestinationSelect}
+          isMobile={isMobile}
+        />
+      )}
+
+      {isDateModalOpen && (
+        <DateModal
+          title="Select Date/Time"
+          onClose={closeDateModal}
+          onSelect={handleDateSelect}
+          isMobile={isMobile}
+        />
+      )}
+
+      {isGuestsModalOpen && (
+        <GuestsModal
+          onClose={closeGuestsModal}
+          onSelect={handleGuestsSelect}
+          initialGuests={guests}
+          isMobile={isMobile}
+        />
+      )}
     </div>
   );
 };
 
 // Destination Modal Component
 const Modal = ({
+  isMobile,
   onClose,
   onSelect,
+  title,
 }: {
   title: string;
+  isMobile: boolean;
   onClose: () => void;
   onSelect: (value: string) => void;
 }) => {
@@ -246,11 +379,11 @@ const Modal = ({
 
   // Suggested destinations
   const destinations = [
-    { name: "Tbilisi, Georgia", description: "Family Friendly" },
-    { name: "Baku, Azerbaijan", description: "For night life" },
-    { name: "Istanbul, Turkey", description: "Popular beach placing" },
-    { name: "Batumi, Georgia", description: "For muslim people" },
-    { name: "London, UK", description: "For architecture" },
+    { name: "Tbilisi International Airport", description: "Airport" },
+    { name: "Batumi International Airport", description: "Airport" },
+    { name: "Kutaisi International Airport", description: "Airport" },
+    { name: "Tbilisi City Center", description: "City Center" },
+    { name: "Batumi City Center", description: "City Center" },
   ];
 
   // Filter destinations based on search query
@@ -261,37 +394,44 @@ const Modal = ({
   // Handle destination selection
   const handleSelectDestination = (destination: string) => {
     setSelectedDestination(destination);
-    onSelect(destination); // Pass the selected destination to the parent
-    onClose(); // Close the modal after selection
+    onSelect(destination);
+    onClose();
   };
 
   // Handle Enter key press
   const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter") {
-      onClose(); // Close the modal on Enter
+      onClose();
     }
   };
 
   return (
-    <div className="absolute top-[80px] flex items-center justify-center">
-      <div className="bg-white p-4 rounded-lg w-[388px] shadow-lg">
+    <div
+      className={`absolute ${
+        isMobile ? "top-full mt-2 w-full" : "top-[80px] w-[388px]"
+      }`}
+    >
+      <div className="bg-white p-4 rounded-lg shadow-lg">
         {/* Search Input */}
         <input
           type="text"
-          placeholder="Search destination"
+          placeholder="Search location"
           className="w-full px-3 py-4 border border-[#F2F2F2] rounded-xl mb-4"
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           onKeyDown={handleKeyPress}
         />
 
-        <Title1 className="text-black mb-6">Suggested destinations</Title1>
+        {!searchQuery && (
+          <Title1 className="text-black mb-6">Popular Locations</Title1>
+        )}
+
         {/* Suggested Destinations */}
         <div className="space-y-3">
           {filteredDestinations.map((destination, index) => (
             <div
               key={index}
-              className="flex items-center justify-start gap-2 rounded-full hover:bg-gray-100 rounded cursor-pointer"
+              className="flex items-center justify-start gap-2 rounded-full hover:bg-gray-100 cursor-pointer p-2"
               onClick={() => handleSelectDestination(destination.name)}
             >
               <Image
@@ -316,10 +456,12 @@ const Modal = ({
 };
 
 const DateModal = ({
+  isMobile,
   onClose,
   onSelect,
 }: {
   title: string;
+  isMobile: boolean;
   onClose: () => void;
   onSelect: (checkIn: string, checkOut: string) => void;
 }) => {
@@ -390,10 +532,10 @@ const DateModal = ({
 
   // Apply selected dates
   const handleApply = () => {
-    if (activeTab === "calendar" && checkIn && checkOut) {
+    if (activeTab === "calendar" && checkIn) {
       onSelect(
         checkIn.toISOString().split("T")[0],
-        checkOut.toISOString().split("T")[0]
+        checkOut ? checkOut.toISOString().split("T")[0] : ""
       );
     } else if (
       activeTab === "flexible" &&
@@ -626,97 +768,9 @@ const DateModal = ({
   const renderFlexibleTab = () => {
     return (
       <div className="space-y-4">
-        {/* How long do you want to stay? */}
-        <div>
-          <h3 className="font-medium mb-2">How long do you want to stay?</h3>
-          <div className="flex flex-wrap gap-2">
-            <Button
-              type="secondary"
-              className={cn(
-                "hover:bg-[#E4ECEC] hover:border-[#266462] hover:text-[#266462]",
-                stayDuration === "weekend"
-                  ? "bg-[#E4ECEC] text-[#266462] border border-[#266462]"
-                  : ""
-              )}
-              onClick={() => setStayDuration("weekend")}
-            >
-              {stayDuration === "weekend" ? (
-                <Image
-                  src={"assets/icons/radio.svg"}
-                  alt="radio"
-                  width={16}
-                  height={16}
-                />
-              ) : (
-                <Image
-                  src={"assets/icons/radio-non.svg"}
-                  alt="radio-non"
-                  width={16}
-                  height={16}
-                />
-              )}
-              A weekend
-            </Button>
-            <Button
-              type="secondary"
-              className={cn(
-                "hover:bg-[#E4ECEC] hover:border-[#266462] hover:text-[#266462]",
-                stayDuration === "week"
-                  ? "bg-[#E4ECEC] text-[#266462] border border-[#266462]"
-                  : ""
-              )}
-              onClick={() => setStayDuration("week")}
-            >
-              {stayDuration === "week" ? (
-                <Image
-                  src={"assets/icons/radio.svg"}
-                  alt="radio"
-                  width={16}
-                  height={16}
-                />
-              ) : (
-                <Image
-                  src={"assets/icons/radio-non.svg"}
-                  alt="radio-non"
-                  width={16}
-                  height={16}
-                />
-              )}
-              A week
-            </Button>
-            <Button
-              type="secondary"
-              className={cn(
-                "hover:bg-[#E4ECEC] hover:border-[#266462] hover:text-[#266462]",
-                stayDuration === "month"
-                  ? "bg-[#E4ECEC] text-[#266462] border border-[#266462]"
-                  : ""
-              )}
-              onClick={() => setStayDuration("month")}
-            >
-              {stayDuration === "month" ? (
-                <Image
-                  src={"assets/icons/radio.svg"}
-                  alt="radio"
-                  width={16}
-                  height={16}
-                />
-              ) : (
-                <Image
-                  src={"assets/icons/radio-non.svg"}
-                  alt="radio-non"
-                  width={16}
-                  height={16}
-                />
-              )}
-              A month
-            </Button>
-          </div>
-        </div>
-
         {/* When do you want to go? */}
         <div>
-          <h3 className="font-medium mb-2">When do you want to go?</h3>
+          <h3 className="font-medium mb-2">When do you need the transfer?</h3>
           {renderMonthViewFlexible()}
         </div>
       </div>
@@ -727,12 +781,14 @@ const DateModal = ({
     <>
       {/* Backdrop */}
       <div
-        className="absolute top-[80px] flex items-center justify-center z-50"
+        className={`absolute ${
+          isMobile ? "top-full mt-2 w-full" : "top-[80px] w-[388px]"
+        }`}
         onClick={onClose}
       >
         {/* Modal */}
         <div
-          className="bg-white p-4 rounded-xl w-[388px] shadow-lg"
+          className="bg-white p-4 rounded-xl shadow-lg"
           onClick={(e) => e.stopPropagation()}
         >
           {/* Tabs */}
@@ -785,10 +841,18 @@ const DateModal = ({
 };
 
 const GuestsModal = ({
+  initialGuests,
+  isMobile,
   onClose,
   onSelect,
-  initialGuests,
 }: {
+  initialGuests: {
+    adults: number;
+    children: number;
+    infants: number;
+    pets: number;
+  };
+  isMobile: boolean;
   onClose: () => void;
   onSelect: (count: {
     adults: number;
@@ -796,12 +860,6 @@ const GuestsModal = ({
     infants: number;
     pets: number;
   }) => void;
-  initialGuests: {
-    adults: number;
-    children: number;
-    infants: number;
-    pets: number;
-  };
 }) => {
   const [adults, setAdults] = useState(initialGuests.adults);
   const [children, setChildren] = useState(initialGuests.children);
@@ -852,7 +910,7 @@ const GuestsModal = ({
 
     switch (category) {
       case "adults":
-        updatedAdults = Math.max(0, adults - 1);
+        updatedAdults = Math.max(1, adults - 1); // At least 1 adult
         setAdults(updatedAdults);
         break;
       case "children":
@@ -890,12 +948,19 @@ const GuestsModal = ({
     <>
       {/* Backdrop */}
       <div
-        className="fixed inset-0 flex items-center justify-center z-10"
+        className={`absolute ${
+          isMobile ? "top-full mt-2 w-full" : "top-[80px] right-[50px] w-94"
+        }`}
         onClick={handleBackdropClick}
       />
       {/* Modal */}
       <div
-        className="absolute z-20 top-[80px] right-[50px] bg-white p-4 w-94 rounded-lg"
+        className="absolute z-20 bg-white p-4 rounded-lg shadow-lg"
+        style={
+          isMobile
+            ? { width: "100%", top: "100%", marginTop: "8px" }
+            : { width: "388px", top: "80px", right: "50px" }
+        }
         onClick={(e) => e.stopPropagation()}
       >
         {/* Adults Counter */}
